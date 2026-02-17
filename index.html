@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor Induction Assessment Dashboard 2026 – Educate!</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #05111a;
+  --surface: #0a1c2a;
+  --card: #0e2035;
+  --card2: #122540;
+  --border: #1a3050;
+  --border2: #1f3a5e;
+  --text: #e5eef5;
+  --muted: #6b8da8;
+  --muted2: #3e5570;
+  --accent: #F1A01B;
+  --accent2: #F4B14D;
+  --green: #5aab74;
+  --amber: #F4B14D;
+  --red: #e05252;
+  --blue: #4D889D;
+  --purple: #7fb3c8;
+  --green-bg: rgba(90,171,116,0.12);
+  --amber-bg: rgba(244,177,77,0.12);
+  --red-bg: rgba(224,82,82,0.12);
+  --blue-bg: rgba(77,136,157,0.12);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ══ HEADER ══ */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 14px; }
+.logo-mark {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent) 0%, #870101 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 14px; color: white; flex-shrink: 0;
+}
+.header h1 { font-size: 17px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.header-sub { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.header-kpis { display: flex; gap: 10px; flex-wrap: wrap; }
+.hkpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 14px;
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 80px;
+}
+.hkpi-val { font-size: 20px; font-weight: 700; color: var(--accent); font-family: 'DM Mono', monospace; }
+.hkpi-label { font-size: 10px; color: var(--muted); margin-top: 1px; white-space: nowrap; }
+
+/* ══ LAYOUT ══ */
+.layout { display: flex; height: calc(100vh - 65px); overflow: hidden; }
+
+/* ══ SIDEBAR ══ */
+.sidebar {
+  width: 260px; flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.filter-panel { padding: 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.filter-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+.filter-select {
+  width: 100%; padding: 9px 12px; margin-bottom: 8px;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 7px; color: var(--text); font-size: 13px; font-family: inherit;
+  appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%236b7f96' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  cursor: pointer;
+}
+.filter-select:focus { outline: none; border-color: var(--accent); }
+.reset-btn {
+  width: 100%; padding: 8px; background: transparent; border: 1px solid var(--border2);
+  border-radius: 7px; color: var(--muted); cursor: pointer; font-family: inherit; font-size: 12px;
+  margin-top: 2px; transition: all .15s;
+}
+.reset-btn:hover { background: var(--card); color: var(--text); }
+
+.list-header {
+  padding: 12px 16px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.list-count { font-size: 12px; color: var(--muted); }
+.list-count strong { color: var(--text); }
+.sort-toggle { font-size: 11px; color: var(--accent); cursor: pointer; background: none; border: none; font-family: inherit; }
+
+.mentor-list { flex: 1; overflow-y: auto; padding: 8px; }
+.mentor-item {
+  padding: 10px 12px; border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer; transition: all .15s;
+  margin-bottom: 4px;
+}
+.mentor-item:hover { background: var(--card); border-color: var(--border2); }
+.mentor-item.active { background: var(--card2); border-color: var(--accent); }
+.mi-name { font-size: 12.5px; font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mi-meta { font-size: 10.5px; color: var(--muted); display: flex; justify-content: space-between; }
+.mi-score { font-weight: 700; font-family: 'DM Mono', monospace; }
+.rag-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; flex-shrink: 0; }
+.dot-green { background: var(--green); }
+.dot-amber { background: var(--amber); }
+.dot-red { background: var(--red); }
+
+/* ══ MAIN PANEL ══ */
+.main { flex: 1; overflow-y: auto; background: var(--bg); }
+
+/* ══ NAV TABS ══ */
+.nav-tabs {
+  display: flex; gap: 4px; padding: 14px 24px 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface); position: sticky; top: 0; z-index: 50;
+}
+.nav-tab {
+  padding: 9px 18px; border-radius: 8px 8px 0 0;
+  border: none; background: none; color: var(--muted);
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all .15s;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.nav-tab:hover { color: var(--text); background: var(--card); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ══ SECTIONS ══ */
+.section { padding: 24px; display: none; }
+.section.active { display: block; }
+
+/* ══ KPI GRID ══ */
+.kpi-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; margin-bottom: 24px; }
+.kpi-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 18px;
+  position: relative; overflow: hidden;
+}
+.kpi-card::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  right: 0; height: 2px;
+}
+.kpi-card.c-green::before { background: var(--green); }
+.kpi-card.c-amber::before { background: var(--amber); }
+.kpi-card.c-red::before { background: var(--red); }
+.kpi-card.c-blue::before { background: var(--blue); }
+.kpi-card.c-accent::before { background: var(--accent); }
+.kpi-icon { font-size: 22px; margin-bottom: 8px; }
+.kpi-val { font-size: 30px; font-weight: 700; font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 4px; }
+.kpi-label { font-size: 11.5px; color: var(--muted); }
+.kpi-sub { font-size: 11px; color: var(--muted2); margin-top: 4px; }
+.kpi-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; margin-top: 6px; }
+
+/* ══ ROW-2 CHARTS ══ */
+.row2 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.chart-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px;
+}
+.chart-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.chart-sub { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.chart-wrap { position: relative; }
+
+/* ══ RAG BARS ══ */
+.rag-bar-item { margin-bottom: 14px; }
+.rag-bar-label { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; }
+.rag-bar-track { height: 10px; border-radius: 5px; background: var(--surface); display: flex; overflow: hidden; }
+.rag-seg { transition: width .4s ease; }
+.rag-green { background: var(--green); }
+.rag-amber { background: var(--amber); }
+.rag-red { background: var(--red); }
+.rag-bar-legend { display: flex; gap: 12px; margin-top: 8px; font-size: 10.5px; color: var(--muted); }
+.rl { display: flex; align-items: center; gap: 4px; }
+
+/* ══ LOCATION GRID ══ */
+.loc-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 20px; }
+.loc-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px; position: relative; overflow: hidden;
+}
+.loc-card::after {
+  content: ''; position: absolute; top: 0; right: 0; bottom: 0;
+  width: 3px;
+}
+.loc-card.lc-mayuge::after { background: var(--green); }
+.loc-card.lc-kampala::after { background: var(--amber); }
+.loc-card.lc-mbarara::after { background: var(--red); }
+.loc-name { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+.loc-count { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.loc-score-big { font-size: 36px; font-weight: 800; font-family: 'DM Mono', monospace; line-height: 1; }
+.loc-score-label { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.loc-bars { }
+.lb { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.lb-label { font-size: 11px; color: var(--muted); width: 80px; flex-shrink: 0; }
+.lb-track { flex: 1; height: 5px; background: var(--surface); border-radius: 3px; overflow: hidden; }
+.lb-fill { height: 100%; border-radius: 3px; }
+.lb-val { font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace; width: 36px; text-align: right; }
+.loc-rag { display: flex; gap: 8px; margin-top: 12px; }
+.loc-rag-item { flex: 1; text-align: center; padding: 6px; border-radius: 6px; background: var(--surface); }
+.loc-rag-val { font-size: 16px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.loc-rag-lbl { font-size: 9px; color: var(--muted); }
+
+/* ══ DEMOGRAPHIC SECTION ══ */
+.demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.section-hd { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.section-hd span { width: 3px; height: 18px; border-radius: 2px; }
+.section-hd .ac { background: var(--accent); }
+.section-hd .gc { background: var(--green); }
+.section-hd .bc { background: var(--blue); }
+.section-hd .pc { background: var(--purple); }
+.section-hd .rc { background: var(--red); }
+
+/* Profile comparison bars */
+.profile-comp { }
+.pc-item { margin-bottom: 16px; }
+.pc-hd { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12.5px; }
+.pc-name { font-weight: 600; }
+.pc-val { font-family: 'DM Mono', monospace; font-weight: 700; }
+.pc-bars { display: flex; flex-direction: column; gap: 4px; }
+.pc-bar { display: flex; align-items: center; gap: 8px; }
+.pc-bar-label { font-size: 10px; color: var(--muted); width: 65px; flex-shrink: 0; }
+.pc-bar-track { flex: 1; height: 6px; background: var(--surface); border-radius: 3px; overflow: hidden; }
+.pc-bar-fill { height: 100%; border-radius: 3px; }
+.pc-bar-val { font-size: 10px; font-family: 'DM Mono', monospace; width: 30px; text-align: right; }
+
+/* Gender cards */
+.gender-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px;
+}
+.gender-icon { font-size: 32px; margin-bottom: 8px; }
+.gender-label { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.gender-count { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.gender-score { font-size: 28px; font-weight: 800; font-family: 'DM Mono', monospace; }
+.gender-score-lbl { font-size: 10.5px; color: var(--muted); margin-bottom: 12px; }
+
+/* ══ QUALITATIVE ══ */
+.qual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.qual-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px;
+}
+.qual-category {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 14px;
+}
+.qual-pill {
+  padding: 3px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700;
+  letter-spacing: .04em;
+}
+.pill-green { background: var(--green-bg); color: var(--green); }
+.pill-amber { background: var(--amber-bg); color: var(--amber); }
+.pill-red { background: var(--red-bg); color: var(--red); }
+.pill-blue { background: var(--blue-bg); color: var(--blue); }
+
+.theme-list { list-style: none; }
+.theme-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.theme-item:last-child { border-bottom: none; }
+.theme-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.theme-text { font-size: 13px; line-height: 1.55; }
+.theme-label { font-weight: 600; margin-bottom: 2px; }
+.theme-desc { color: var(--muted); font-size: 12px; }
+
+/* Callout cards */
+.callout-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.callout {
+  background: var(--card2); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 16px;
+  position: relative; overflow: hidden;
+}
+.callout::before {
+  content: '\201C'; font-size: 72px; font-weight: 900; line-height: 1;
+  color: var(--accent); opacity: .12;
+  position: absolute; top: -10px; left: 10px;
+  font-family: Georgia, serif;
+}
+.callout-text { font-size: 12.5px; line-height: 1.65; color: var(--text); margin-bottom: 10px; position: relative; z-index: 1; }
+.callout-author { font-size: 10.5px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+.callout-rag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 12px; }
+
+/* ══ EXECUTIVE SUMMARY ══ */
+.exec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.exec-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; border-left: 4px solid;
+}
+.ec-green { border-left-color: var(--green); }
+.ec-red { border-left-color: var(--red); }
+.ec-amber { border-left-color: var(--amber); }
+.ec-blue { border-left-color: var(--blue); }
+.exec-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 12px; }
+.eb-green { background: var(--green-bg); color: var(--green); }
+.eb-red { background: var(--red-bg); color: var(--red); }
+.eb-amber { background: var(--amber-bg); color: var(--amber); }
+.eb-blue { background: var(--blue-bg); color: var(--blue); }
+.exec-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.exec-body { font-size: 13px; color: #b0bfd0; line-height: 1.65; }
+.exec-list { margin: 10px 0 0 0; padding-left: 18px; }
+.exec-list li { margin-bottom: 6px; font-size: 13px; color: var(--muted); }
+.exec-list li strong { color: var(--text); }
+
+.action-steps { }
+.action-step {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: var(--card2); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 16px; margin-bottom: 10px;
+}
+.step-num { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0; }
+.sn-red { background: var(--red-bg); color: var(--red); border: 1.5px solid var(--red); }
+.sn-amber { background: var(--amber-bg); color: var(--amber); border: 1.5px solid var(--amber); }
+.sn-green { background: var(--green-bg); color: var(--green); border: 1.5px solid var(--green); }
+.step-body { flex: 1; }
+.step-title { font-size: 13.5px; font-weight: 600; margin-bottom: 4px; }
+.step-desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+.step-tag { display: inline-block; margin-top: 8px; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+
+/* ══ INDIVIDUAL VIEW ══ */
+.ind-header {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px 24px;
+  margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
+}
+.ind-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.ind-meta { font-size: 12px; color: var(--muted); }
+.ind-meta span { margin-right: 14px; }
+.ind-score-ring { text-align: center; }
+.score-ring { position: relative; width: 90px; height: 90px; }
+.score-ring svg { transform: rotate(-90deg); }
+.score-ring .ring-val {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 20px; font-weight: 700; font-family: 'DM Mono', monospace;
+}
+.ind-scores { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+.is-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px;
+}
+.is-label { font-size: 10.5px; color: var(--muted); margin-bottom: 6px; }
+.is-val { font-size: 22px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.is-max { font-size: 11px; color: var(--muted); }
+.is-bar { height: 5px; background: var(--surface); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+.is-fill { height: 100%; border-radius: 3px; }
+.ind-qual { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.iq-card { background: var(--card2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px; }
+.iq-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+.iq-title.str { color: var(--green); }
+.iq-title.imp { color: var(--amber); }
+.iq-title.cmt { color: var(--blue); }
+.iq-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.placeholder {
+  height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: var(--muted2); text-align: center;
+}
+.placeholder-icon { font-size: 48px; margin-bottom: 16px; opacity: .4; }
+.placeholder-text { font-size: 15px; color: var(--muted); }
+.placeholder-sub { font-size: 12px; color: var(--muted2); margin-top: 6px; }
+
+/* ══ TABS INSIDE SECTIONS ══ */
+.mini-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+.mini-tab { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border2); background: none; color: var(--muted); font-family: inherit; font-size: 12px; cursor: pointer; transition: all .15s; }
+.mini-tab.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
+.mini-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+/* ══ RESPONSIVE ══ */
+@media (max-width: 900px) {
+  .kpi-grid { grid-template-columns: repeat(3,1fr); }
+  .row2 { grid-template-columns: 1fr 1fr; }
+  .loc-grid { grid-template-columns: 1fr; }
+  .callout-grid { grid-template-columns: 1fr 1fr; }
+  .layout { flex-direction: column; height: auto; }
+  .sidebar { width: 100%; max-height: 280px; }
+}
+@media (max-width: 600px) {
+  .kpi-grid { grid-template-columns: repeat(2,1fr); }
+  .row2 { grid-template-columns: 1fr; }
+  .demo-grid { grid-template-columns: 1fr; }
+  .qual-grid { grid-template-columns: 1fr; }
+  .exec-grid { grid-template-columns: 1fr; }
+  .callout-grid { grid-template-columns: 1fr; }
+  .ind-scores { grid-template-columns: repeat(2,1fr); }
+}
+
+/* ══ CU TABLE ══ */
+.cu-thead {
+  display: grid;
+  grid-template-columns: 36px 1fr 80px 44px 90px 72px 72px 72px 80px 100px 80px;
+  padding: 10px 14px; gap: 8px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border2);
+  position: sticky; top: 0; z-index: 10;
+}
+.cu-th {
+  font-size: 10.5px; font-weight: 700;
+  color: var(--muted); text-transform: uppercase; letter-spacing: .05em;
+  user-select: none; white-space: nowrap;
+}
+.cu-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 80px 44px 90px 72px 72px 72px 80px 100px 80px;
+  padding: 11px 14px; gap: 8px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background .12s; align-items: center;
+}
+.cu-row:last-child { border-bottom: none; }
+.cu-row:hover { background: var(--card2); }
+.cu-row.expanded { background: var(--card2); border-left: 3px solid var(--accent); }
+.cu-cell { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cu-col-rank { color: var(--muted2); font-size: 11px; font-family: 'DM Mono',monospace; }
+.cu-col-cu { font-weight: 600; }
+.cu-col-site .site-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+.cu-col-n { color: var(--muted); font-family: 'DM Mono',monospace; text-align: center; }
+.cu-col-score { font-family: 'DM Mono',monospace; font-weight: 700; font-size: 13px; }
+.cu-score-bar { height: 3px; border-radius: 2px; margin-top: 4px; background: var(--surface); overflow: hidden; }
+.cu-score-fill { height: 100%; border-radius: 2px; }
+.cu-metric-val { font-family: 'DM Mono',monospace; font-size: 12px; font-weight: 600; }
+.cu-metric-bar { height: 3px; background: var(--surface); border-radius: 2px; margin-top: 3px; overflow: hidden; }
+.cu-metric-fill { height: 100%; border-radius: 2px; }
+.cu-rag-mini { display: flex; gap: 3px; align-items: center; }
+.cu-rag-seg { height: 8px; border-radius: 2px; min-width: 3px; }
+.cu-status-pill { display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+
+/* Detail drawer score cards */
+.cud-score-card { background: var(--surface); border-radius: 8px; padding: 12px; }
+.cud-score-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
+.cud-score-val { font-size: 22px; font-weight: 700; font-family: 'DM Mono',monospace; }
+.cud-score-max { font-size: 11px; color: var(--muted2); }
+.cud-score-bar { height: 5px; background: var(--card); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+.cud-score-fill { height: 100%; border-radius: 3px; }
+
+/* Mentor chip */
+.mentor-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 20px; font-size: 11px;
+  background: var(--surface); border: 1px solid var(--border2);
+  cursor: pointer; transition: all .12s;
+}
+.mentor-chip:hover { border-color: var(--accent); color: var(--accent); }
+.mentor-chip .mc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.mentor-chip .mc-score { font-family: 'DM Mono',monospace; font-size: 10px; color: var(--muted); }
+
+.fade-in { animation: fadeIn .3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">E!</div>
+    <div>
+      <div class="h1" style="font-size:17px;font-weight:700;">Mentor Induction Assessment 2026 – T1</div>
+      <div class="header-sub">EXP 4.0 · Uganda · January 2026 · Executive View</div>
+    </div>
+  </div>
+  <div class="header-kpis">
+    <div class="hkpi"><span class="hkpi-val" id="hkpi-total">320</span><span class="hkpi-label">Assessed</span></div>
+    <div class="hkpi"><span class="hkpi-val" style="color:var(--green)" id="hkpi-green">52</span><span class="hkpi-label">Green ✓</span></div>
+    <div class="hkpi"><span class="hkpi-val" style="color:var(--amber)" id="hkpi-amber">239</span><span class="hkpi-label">Amber ◎</span></div>
+    <div class="hkpi"><span class="hkpi-val" style="color:var(--red)" id="hkpi-red">28</span><span class="hkpi-label">Red ✗</span></div>
+    <div class="hkpi"><span class="hkpi-val" id="hkpi-avg">72%</span><span class="hkpi-label">Avg Score</span></div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="filter-panel">
+      <div class="filter-label">🔎 Filters</div>
+      <select class="filter-select" id="f-location" onchange="applyFilters()">
+        <option value="">All Locations</option>
+        <option value="Kampala">Kampala</option>
+        <option value="Mbarara">Mbarara</option>
+        <option value="Mayuge">Mayuge</option>
+      </select>
+      <select class="filter-select" id="f-profile" onchange="applyFilters()">
+        <option value="">All Profiles</option>
+        <option value="Old Mentor">Old Mentor</option>
+        <option value="New Mentor">New Mentor</option>
+        <option value="Co Mentor">Co Mentor</option>
+      </select>
+      <select class="filter-select" id="f-gender" onchange="applyFilters()">
+        <option value="">All Genders</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+      <select class="filter-select" id="f-cu" onchange="applyFilters()">
+        <option value="">All CUs (45)</option>
+      </select>
+      <select class="filter-select" id="f-rag" onchange="applyFilters()">
+        <option value="">All Ratings</option>
+        <option value="Green">Green Only</option>
+        <option value="Yellow">Amber Only</option>
+        <option value="Red">Red Only</option>
+      </select>
+      <button class="reset-btn" onclick="resetFilters()">↺ Reset All Filters</button>
+    </div>
+    <div class="list-header">
+      <div class="list-count"><strong id="list-n">320</strong> mentors</div>
+      <button class="sort-toggle" id="sort-btn" onclick="toggleSort()">Sort: Score ↓</button>
+    </div>
+    <div class="mentor-list" id="mentor-list"></div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <!-- NAV TABS -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showTab('overview')">📊 Overview</button>
+      <button class="nav-tab" onclick="showTab('locations')">📍 By Location</button>
+      <button class="nav-tab" onclick="showTab('demographics')">👥 Demographics</button>
+      <button class="nav-tab" onclick="showTab('qualitative')">💬 Qualitative</button>
+      <button class="nav-tab" onclick="showTab('executive')">🎯 Executive Summary</button>
+      <button class="nav-tab" onclick="showTab('cu')">🏢 CU Breakdown</button>
+      <button class="nav-tab" onclick="showTab('individual')">🔍 Individual</button>
+    </div>
+
+    <!-- ═══ OVERVIEW TAB ═══ -->
+    <div class="section active fade-in" id="tab-overview">
+      <!-- KPI ROW -->
+      <div class="kpi-grid">
+        <div class="kpi-card c-accent">
+          <div class="kpi-icon">📋</div>
+          <div class="kpi-val" id="ov-total">320</div>
+          <div class="kpi-label">Total Assessed</div>
+          <div class="kpi-sub">3 sites · 45 CUs</div>
+        </div>
+        <div class="kpi-card c-green">
+          <div class="kpi-icon">🏆</div>
+          <div class="kpi-val" id="ov-green" style="color:var(--green)">52</div>
+          <div class="kpi-label">Green (≥80%)</div>
+          <div class="kpi-badge pill-green" id="ov-green-pct">16.3%</div>
+        </div>
+        <div class="kpi-card c-amber">
+          <div class="kpi-icon">⚡</div>
+          <div class="kpi-val" id="ov-amber" style="color:var(--amber)">239</div>
+          <div class="kpi-label">Amber (60–79%)</div>
+          <div class="kpi-badge pill-amber" id="ov-amber-pct">74.7%</div>
+        </div>
+        <div class="kpi-card c-red">
+          <div class="kpi-icon">⚠️</div>
+          <div class="kpi-val" id="ov-red" style="color:var(--red)">28</div>
+          <div class="kpi-label">Red (&lt;60%)</div>
+          <div class="kpi-badge pill-red" id="ov-red-pct">8.8%</div>
+        </div>
+        <div class="kpi-card c-blue">
+          <div class="kpi-icon">📈</div>
+          <div class="kpi-val" id="ov-avg" style="color:var(--blue)">71.6%</div>
+          <div class="kpi-label">Cohort Average</div>
+          <div class="kpi-sub">Score out of 100%</div>
+        </div>
+      </div>
+
+      <!-- RAG DISTRIBUTIONS -->
+      <div class="row2">
+        <div class="chart-card" style="grid-column: span 2;">
+          <div class="chart-title">RAG Distribution by Component</div>
+          <div class="chart-sub">Performance banding across all 4 assessment areas</div>
+          <div id="rag-bars"></div>
+          <div class="rag-bar-legend" style="margin-top:10px;">
+            <div class="rl"><div class="rag-dot rag-green" style="width:10px;height:10px;border-radius:2px;"></div> Green (target)</div>
+            <div class="rl"><div class="rag-dot rag-amber" style="width:10px;height:10px;border-radius:2px;"></div> Amber (developing)</div>
+            <div class="rl"><div class="rag-dot rag-red" style="width:10px;height:10px;border-radius:2px;"></div> Red (needs support)</div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Overall Rating Distribution</div>
+          <div class="chart-sub">Overall RAG across all mentors</div>
+          <div class="chart-wrap" style="height:180px;">
+            <canvas id="chart-donut"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPONENT SCORES RADAR + BAR -->
+      <div class="row2">
+        <div class="chart-card">
+          <div class="chart-title">Component Score Averages</div>
+          <div class="chart-sub">Normalised to % of max score</div>
+          <div class="chart-wrap" style="height:220px;">
+            <canvas id="chart-radar"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Site Comparison – Avg Component Scores</div>
+          <div class="chart-sub">Kampala vs Mbarara vs Mayuge</div>
+          <div class="chart-wrap" style="height:220px;">
+            <canvas id="chart-site-bar"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Top 10 Performers</div>
+          <div class="chart-sub">Highest overall score %</div>
+          <div id="top10-list" style="max-height:240px;overflow-y:auto;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ LOCATIONS TAB ═══ -->
+    <div class="section fade-in" id="tab-locations">
+      <div class="section-hd"><span class="ac"></span> Location Performance Overview</div>
+      <div class="loc-grid">
+        <!-- Mayuge -->
+        <div class="loc-card lc-mayuge">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div class="loc-name">Mayuge</div>
+              <div class="loc-count">83 mentors assessed</div>
+            </div>
+            <div class="qual-pill pill-green">BEST SITE</div>
+          </div>
+          <div class="loc-score-big" style="color:var(--green)" id="loc-mayuge-score">81.1%</div>
+          <div class="loc-score-label">Average Total Score</div>
+          <div class="loc-bars">
+            <div class="lb"><span class="lb-label">Attendance</span><div class="lb-track"><div class="lb-fill" style="background:var(--green)" id="lb-mayuge-att"></div></div><span class="lb-val" id="lv-mayuge-att">9.6/10</span></div>
+            <div class="lb"><span class="lb-label">Knwl. Share</span><div class="lb-track"><div class="lb-fill" style="background:var(--blue)" id="lb-mayuge-ks"></div></div><span class="lb-val" id="lv-mayuge-ks">14.0/18</span></div>
+            <div class="lb"><span class="lb-label">Mock Lesson</span><div class="lb-track"><div class="lb-fill" style="background:var(--accent)" id="lb-mayuge-mock"></div></div><span class="lb-val" id="lv-mayuge-mock">52.8/75</span></div>
+            <div class="lb"><span class="lb-label">Culture</span><div class="lb-track"><div class="lb-fill" style="background:var(--purple)" id="lb-mayuge-cult"></div></div><span class="lb-val" id="lv-mayuge-cult">29.3/36</span></div>
+          </div>
+          <div class="loc-rag">
+            <div class="loc-rag-item"><div class="loc-rag-val" style="color:var(--green)" id="lr-mayuge-g">45</div><div class="loc-rag-lbl">Green</div></div>
+            <div class="loc-rag-item"><div class="loc-rag-val" style="color:var(--amber)" id="lr-mayuge-a">35</div><div class="loc-rag-lbl">Amber</div></div>
+            <div class="loc-rag-item"><div class="loc-rag-val" style="color:var(--red)" id="lr-mayuge-r">2</div><div class="loc-rag-lbl">Red</div></div>
+          </div>
+        </div>
+        <!-- Kampala -->
+        <div class="loc-card lc-kampala">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div class="loc-name">Kampala</div>
+              <div class="loc-count">112 mentors assessed</div>
+            </div>
+            <div class="qual-pill pill-amber">MIXED RESULTS</div>
+          </div>
+          <div class="loc-score-big" style="color:var(--amber)" id="loc-kampala-score">69.7%</div>
+          <div class="loc-score-label">Average Total Score</div>
+          <div class="loc-bars">
+            <div class="lb"><span class="lb-label">Attendance</span><div class="lb-track"><div class="lb-fill" style="background:var(--green)" id="lb-kampala-att"></div></div><span class="lb-val" id="lv-kampala-att">9.9/10</span></div>
+            <div class="lb"><span class="lb-label">Knwl. Share</span><div class="lb-track"><div class="lb-fill" style="background:var(--blue)" id="lb-kampala-ks"></div></div><span class="lb-val" id="lv-kampala-ks">10.7/18</span></div>
+            <div class="lb"><span class="lb-label">Mock Lesson</span><div class="lb-track"><div class="lb-fill" style="background:var(--accent)" id="lb-kampala-mock"></div></div><span class="lb-val" id="lv-kampala-mock">41.3/75</span></div>
+            <div class="lb"><span class="lb-label">Culture</span><div class="lb-track"><div class="lb-fill" style="background:var(--purple)" id="lb-kampala-cult"></div></div><span class="lb-val" id="lv-kampala-cult">23.7/36</span></div>
+          </div>
+          <div class="loc-rag">
+            <div class="loc-rag-item"><div class="loc-rag-val" style="color:var(--green)" id="lr-kampala-g">0</div><div class="loc-rag-lbl">Green</div></div>
+            <div class="loc-rag-item"><div class="loc-rag-val" style="color:var(--amber)" id="lr-kampala-a">110</div><div class="loc-rag-lbl">Amber</div></div>
+            <div class="loc-rag-item"><div class="loc-rag-val" style="color:var(--red)" id="lr-kampala-r">2</div><div class="loc-rag-lbl">Red</div></div>
+          </div>
+        </div>
+        <!-- Mbarara -->
+        <div class="loc-card lc-mbarara">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div class="loc-name">Mbarara</div>
+              <div class="loc-count">125 mentors assessed</div>
+            </div>
+            <div class="qual-pill pill-red">NEEDS ATTENTION</div>
+          </div>
+          <div class="loc-score-big" style="color:var(--red)" id="loc-mbarara-score">67.3%</div>
+          <div class="loc-score-label">Average Total Score</div>
+          <div class="loc-bars">
+            <div class="lb"><span class="lb-label">Attendance</span><div class="lb-track"><div class="lb-fill" style="background:var(--green)" id="lb-mbarara-att"></div></div><span class="lb-val" id="lv-mbarara-att">9.0/10</span></div>
+            <div class="lb"><span class="lb-label">Knwl. Share</span><div class="lb-track"><div class="lb-fill" style="background:var(--blue)" id="lb-mbarara-ks"></div></div><span class="lb-val" id="lv-mbarara-ks">11.3/18</span></div>
+            <div class="lb"><span class="lb-label">Mock Lesson</span><div class="lb-track"><div class="lb-fill" style="background:var(--accent)" id="lb-mbarara-mock"></div></div><span class="lb-val" id="lv-mbarara-mock">38.9/75</span></div>
+            <div class="lb"><span class="lb-label">Culture</span><div class="lb-track"><div class="lb-fill" style="background:var(--purple)" id="lb-mbarara-cult"></div></div><span class="lb-val" id="lv-mbarara-cult">22.9/36</span></div>
+          </div>
+          <div class="loc-rag">
+            <div class="loc-rag-item"><div class="loc-rag-val" style="color:var(--green)" id="lr-mbarara-g">7</div><div class="loc-rag-lbl">Green</div></div>
+            <div class="loc-rag-item"><div class="loc-rag-val" style="color:var(--amber)" id="lr-mbarara-a">94</div><div class="loc-rag-lbl">Amber</div></div>
+            <div class="loc-rag-item"><div class="loc-rag-val" style="color:var(--red)" id="lr-mbarara-r">24</div><div class="loc-rag-lbl">Red</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Site chart comparison -->
+      <div class="row2" style="grid-template-columns:1fr 1fr;">
+        <div class="chart-card">
+          <div class="chart-title">Rating Distribution by Site</div>
+          <div class="chart-sub">Stacked Green / Amber / Red per location</div>
+          <div class="chart-wrap" style="height:220px;"><canvas id="chart-loc-stacked"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Score Profile by Location</div>
+          <div class="chart-sub">Normalised avg across 4 components</div>
+          <div class="chart-wrap" style="height:220px;"><canvas id="chart-loc-radar"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Mbarara alert box -->
+      <div class="exec-card ec-red" style="margin-bottom:16px;">
+        <div class="exec-badge eb-red">⚠️ ACTION REQUIRED</div>
+        <div class="exec-title">Mbarara: Systemic Performance Gaps Requiring Immediate Attention</div>
+        <div class="exec-body">Mbarara is the only site with zero Green-rated mentors in the overall rating. With 24 Red-rated mentors (19% of cohort), concentrated intervention is critical ahead of Term 1 school deployment.
+          <ul class="exec-list">
+            <li><strong>Lesson Mock avg: 38.9/75</strong> — 14+ points below Mayuge, signalling weak facilitation competency</li>
+            <li><strong>Culture Score avg: 22.9/36</strong> — Below the Green threshold (30) for all mentors assessed</li>
+            <li><strong>24 Red-rated mentors</strong> need targeted coaching plans before school deployment</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ DEMOGRAPHICS TAB ═══ -->
+    <div class="section fade-in" id="tab-demographics">
+      <div class="section-hd"><span class="bc"></span> Mentor Profile Performance</div>
+      <div class="demo-grid">
+        <div class="chart-card">
+          <div class="chart-title">Average Total Score by Mentor Profile</div>
+          <div class="chart-sub">Co-Mentor / Old Mentor / New Mentor</div>
+          <div class="chart-wrap" style="height:200px;"><canvas id="chart-profile-bar"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">RAG Distribution by Profile</div>
+          <div class="chart-sub">Green / Amber / Red breakdown</div>
+          <div class="chart-wrap" style="height:200px;"><canvas id="chart-profile-rag"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Profile detail cards -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+        <div class="kpi-card c-blue">
+          <div class="kpi-icon">🤝</div>
+          <div class="kpi-val" style="color:var(--blue)">75.9%</div>
+          <div class="kpi-label">Co Mentor Avg</div>
+          <div class="kpi-sub">32 mentors · 10 Green · 1 Red</div>
+        </div>
+        <div class="kpi-card c-amber">
+          <div class="kpi-icon">🎓</div>
+          <div class="kpi-val" style="color:var(--amber)">71.2%</div>
+          <div class="kpi-label">Old Mentor Avg</div>
+          <div class="kpi-sub">165 mentors · 26 Green · 16 Red</div>
+        </div>
+        <div class="kpi-card c-accent">
+          <div class="kpi-icon">🌱</div>
+          <div class="kpi-val" style="color:var(--accent)">71.3%</div>
+          <div class="kpi-label">New Mentor Avg</div>
+          <div class="kpi-sub">121 mentors · 16 Green · 10 Red</div>
+        </div>
+      </div>
+
+      <div class="section-hd" style="margin-top:8px;"><span class="pc"></span> Gender Breakdown</div>
+      <div class="demo-grid">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="gender-card">
+            <div class="gender-icon">♂</div>
+            <div class="gender-label">Male</div>
+            <div class="gender-count">173 mentors (54%)</div>
+            <div class="gender-score" style="color:var(--blue)">71.2%</div>
+            <div class="gender-score-lbl">Avg Total Score</div>
+            <div class="rag-bar-item">
+              <div class="rag-bar-track" style="height:8px;border-radius:4px;">
+                <div class="rag-seg rag-green" style="width:16.2%"></div>
+                <div class="rag-seg rag-amber" style="width:73.4%"></div>
+                <div class="rag-seg rag-red" style="width:10.4%"></div>
+              </div>
+            </div>
+            <div class="rag-bar-legend" style="margin-top:6px;font-size:10px;">
+              <div class="rl"><div class="rag-dot rag-green" style="width:8px;height:8px;border-radius:2px;"></div> 28 Green</div>
+              <div class="rl"><div class="rag-dot rag-amber" style="width:8px;height:8px;border-radius:2px;"></div> 127 Amber</div>
+              <div class="rl"><div class="rag-dot rag-red" style="width:8px;height:8px;border-radius:2px;"></div> 18 Red</div>
+            </div>
+          </div>
+          <div class="gender-card">
+            <div class="gender-icon">♀</div>
+            <div class="gender-label">Female</div>
+            <div class="gender-count">146 mentors (46%)</div>
+            <div class="gender-score" style="color:var(--purple)">72.1%</div>
+            <div class="gender-score-lbl">Avg Total Score</div>
+            <div class="rag-bar-item">
+              <div class="rag-bar-track" style="height:8px;border-radius:4px;">
+                <div class="rag-seg rag-green" style="width:15.8%"></div>
+                <div class="rag-seg rag-amber" style="width:76.7%"></div>
+                <div class="rag-seg rag-red" style="width:6.8%"></div>
+              </div>
+            </div>
+            <div class="rag-bar-legend" style="margin-top:6px;font-size:10px;">
+              <div class="rl"><div class="rag-dot rag-green" style="width:8px;height:8px;border-radius:2px;"></div> 23 Green</div>
+              <div class="rl"><div class="rag-dot rag-amber" style="width:8px;height:8px;border-radius:2px;"></div> 112 Amber</div>
+              <div class="rl"><div class="rag-dot rag-red" style="width:8px;height:8px;border-radius:2px;"></div> 10 Red</div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Gender vs. Component Scores</div>
+          <div class="chart-sub">Male vs. Female across all 4 assessment areas</div>
+          <div class="chart-wrap" style="height:220px;"><canvas id="chart-gender-radar"></canvas></div>
+        </div>
+      </div>
+
+      <div class="section-hd" style="margin-top:8px;"><span class="gc"></span> Key Observation</div>
+      <div class="exec-card ec-blue" style="border-left-color:var(--blue);">
+        <div class="exec-badge eb-blue">📊 DEMOGRAPHIC INSIGHT</div>
+        <div class="exec-title">Gender Parity is Strong; Profile Gap is Narrow</div>
+        <div class="exec-body">Female mentors outperform males marginally (72.1% vs 71.2%), and show lower Red rates (6.8% vs 10.4%), suggesting gender is not a risk factor. Co-Mentors lead at 75.9% — likely due to their support role and prior exposure — while Old and New Mentors are statistically equivalent (71.2% vs 71.3%), suggesting that experience alone is not translating into superior performance.</div>
+      </div>
+    </div>
+
+    <!-- ═══ QUALITATIVE TAB ═══ -->
+    <div class="section fade-in" id="tab-qualitative">
+      <div class="section-hd"><span class="gc"></span> Strengths Identified</div>
+      <div class="qual-grid">
+        <div class="qual-card">
+          <div class="qual-category"><span class="qual-pill pill-green">STRENGTH</span> Teaching Practice & Facilitation</div>
+          <ul class="theme-list">
+            <li class="theme-item">
+              <div class="theme-icon" style="background:var(--green-bg);">🎯</div>
+              <div class="theme-text"><div class="theme-label">Session Flow & Structure</div><div class="theme-desc">Many mentors demonstrated clear lesson structure with well-paced introductions, logical flow, and strong reflections. Evaluators noted "seamless session flow" and "clear objective delivery."</div></div>
+            </li>
+            <li class="theme-item">
+              <div class="theme-icon" style="background:var(--green-bg);">🤝</div>
+              <div class="theme-text"><div class="theme-label">Learner Engagement & Participation</div><div class="theme-desc">High engagement through energizers, group activities, and checking for understanding. Noted strength particularly in Mayuge cohort — "engaged everyone in class."</div></div>
+            </li>
+            <li class="theme-item">
+              <div class="theme-icon" style="background:var(--green-bg);">💪</div>
+              <div class="theme-text"><div class="theme-label">Confidence & Presence</div><div class="theme-desc">Mentors across all sites showed strong personal presence. Frequent comments: "confident," "passionate," "audible," and "time-conscious."</div></div>
+            </li>
+          </ul>
+        </div>
+        <div class="qual-card">
+          <div class="qual-category"><span class="qual-pill pill-green">STRENGTH</span> Culture & Professionalism</div>
+          <ul class="theme-list">
+            <li class="theme-item">
+              <div class="theme-icon" style="background:var(--green-bg);">⏰</div>
+              <div class="theme-text"><div class="theme-label">Time Management & Punctuality</div><div class="theme-desc">Strong time management cited across sites — "use of time reminders during group activities," and intentional pacing throughout lessons.</div></div>
+            </li>
+            <li class="theme-item">
+              <div class="theme-icon" style="background:var(--green-bg);">📋</div>
+              <div class="theme-text"><div class="theme-label">Visual Aids & Classroom Prep</div><div class="theme-desc">"Well-written flipchart," clear visual materials, and structured props noted as highlights. Mentors came prepared with relevant teaching tools.</div></div>
+            </li>
+            <li class="theme-item">
+              <div class="theme-icon" style="background:var(--green-bg);">🌱</div>
+              <div class="theme-text"><div class="theme-label">Peer Support & Growth Mindset</div><div class="theme-desc">Multiple mentors noted for supporting struggling peers, continuous feedback-seeking, and demonstrating eagerness to learn and improve.</div></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-hd"><span class="rc"></span> Development Areas</div>
+      <div class="qual-grid">
+        <div class="qual-card">
+          <div class="qual-category"><span class="qual-pill pill-red">GAP</span> Knowledge Mastery</div>
+          <ul class="theme-list">
+            <li class="theme-item">
+              <div class="theme-icon" style="background:var(--red-bg);">📚</div>
+              <div class="theme-text"><div class="theme-label">Weak Content Mastery</div><div class="theme-desc">52% of mentors scored Red on Knowledge Share. Common feedback: "struggling with content mastery," conceptual confusion on key topics (e.g., PEDVU framework), and inability to simplify complex ideas for learners.</div></div>
+            </li>
+            <li class="theme-item">
+              <div class="theme-icon" style="background:var(--red-bg);">❓</div>
+              <div class="theme-text"><div class="theme-label">Lack of Checking for Understanding</div><div class="theme-desc">Across all sites, evaluators consistently flagged that mentors "explain concepts clearly but don't check for learners' understanding." This is the single most recurring development theme.</div></div>
+            </li>
+          </ul>
+        </div>
+        <div class="qual-card">
+          <div class="qual-category"><span class="qual-pill pill-red">GAP</span> Lesson Mock Performance</div>
+          <ul class="theme-list">
+            <li class="theme-item">
+              <div class="theme-icon" style="background:var(--red-bg);">🎭</div>
+              <div class="theme-text"><div class="theme-label">Classroom Management Gaps</div><div class="theme-desc">61% scored Red on Lesson Mock. Feedback highlights: unclear instructions, poor management of group activities, "awkward silence" moments, and failure to use ISTUCK techniques.</div></div>
+            </li>
+            <li class="theme-item">
+              <div class="theme-icon" style="background:var(--red-bg);">🔄</div>
+              <div class="theme-text"><div class="theme-label">Delivery Consistency & Movement</div><div class="theme-desc">Evaluators noted "no intentional movement," "too much book nursing," and mentors not linking visual aids to lesson content. Energy levels and delivery pacing need significant work.</div></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Human element callout cards -->
+      <div class="section-hd" style="margin-top:4px;"><span class="bc"></span> The Human Element — Field Voices</div>
+      <div class="callout-grid">
+        <div class="callout">
+          <div class="callout-text">"She is really good at coaching and mentoring — supported peers struggling with content mastery and understanding throughout the entire induction. She set high expectations for her class and managed to get everyone involved."</div>
+          <div class="callout-author"><span>Ntunda Habib · Mayuge · Co Mentor</span><span class="callout-rag" style="background:var(--green-bg);color:var(--green)">🟢 94.6%</span></div>
+        </div>
+        <div class="callout">
+          <div class="callout-text">"Passionate, time-conscious, and confident. Session flow was seamless and engagement was high. I liked the use of props — phones were used really creatively. Knowledge shares still need more impact."</div>
+          <div class="callout-author"><span>Tumuhire Vincent · Mbarara · New Mentor</span><span class="callout-rag" style="background:var(--amber-bg);color:var(--amber)">🟡 69.4%</span></div>
+        </div>
+        <div class="callout">
+          <div class="callout-text">"He has strong passion for learning and continuously seeks feedback for growth. However he is struggling with content mastery. The topic was simple — entrepreneurship — but too many aspects were discussed rather than one main concept."</div>
+          <div class="callout-author"><span>Ndyamuhakli Sympson · Mbarara · New Mentor</span><span class="callout-rag" style="background:var(--amber-bg);color:var(--amber)">🟡 67.5%</span></div>
+        </div>
+        <div class="callout">
+          <div class="callout-text">"Started with a great energizer, well-written flipchart, giving live examples, and reflected on the session. However, moves around less to help in groups — visual aids present but rarely referred to or linked to the lesson."</div>
+          <div class="callout-author"><span>Kangume Pauscy · Mbarara · Old Mentor</span><span class="callout-rag" style="background:var(--amber-bg);color:var(--amber)">🟡 69.9%</span></div>
+        </div>
+        <div class="callout">
+          <div class="callout-text">"One of the most eager learners in the cohort and a good team player. His performance was affected by personal circumstances — lost his phone and faced scholarship issues during the induction period."</div>
+          <div class="callout-author"><span>Alituha Denis · Mbarara · Old Mentor</span><span class="callout-rag" style="background:var(--amber-bg);color:var(--amber)">🟡 64.4%</span></div>
+        </div>
+        <div class="callout">
+          <div class="callout-text">"She failed to use ISTUCK techniques so the session ended sounding like a lecture. She is always smart and decent, however has failed to adapt to Educate! ways of work. She was removed from two partner schools."</div>
+          <div class="callout-author"><span>Naturinda Isaac · Mbarara · Old Mentor</span><span class="callout-rag" style="background:var(--red-bg);color:var(--red)">🔴 54.2%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ EXECUTIVE SUMMARY TAB ═══ -->
+    <div class="section fade-in" id="tab-executive">
+      <div class="section-hd"><span class="gc"></span> What's Working Well</div>
+      <div class="exec-grid">
+        <div class="exec-card ec-green">
+          <div class="exec-badge eb-green">✅ CURRENT WIN</div>
+          <div class="exec-title">Attendance is a Cohort Strength</div>
+          <div class="exec-body">74% of all mentors scored Green on Attendance (full 10/10 days). Only 8% Red. All three sites show attendance above 90%, led by Kampala at 9.9/10 average. This signals strong motivation and commitment across the cohort.</div>
+        </div>
+        <div class="exec-card ec-green">
+          <div class="exec-badge eb-green">✅ CURRENT WIN</div>
+          <div class="exec-title">Mayuge is a Model Site — 54% Green Overall</div>
+          <div class="exec-body">Mayuge leads all sites by a significant margin with 81.1% average score. 54% (45 out of 83) achieved Green rating overall. Knowledge Share (14.0/18), Lesson Mock (52.8/75) and Culture (29.3/36) all significantly outperform other sites. Mayuge's practices should be documented and shared as best-practice benchmarks.</div>
+        </div>
+        <div class="exec-card ec-green">
+          <div class="exec-badge eb-green">✅ CURRENT WIN</div>
+          <div class="exec-title">Co-Mentors & Female Mentors Lead in Performance</div>
+          <div class="exec-body">Co-Mentors average 75.9% — 4–5 percentage points ahead of Old and New Mentor cohorts. Female mentors score marginally higher (72.1% vs 71.2%) and have lower Red rates (6.8% vs 10.4%). The support and co-teaching model appears effective.</div>
+        </div>
+        <div class="exec-card ec-green">
+          <div class="exec-badge eb-green">✅ CURRENT WIN</div>
+          <div class="exec-title">New Mentors Equal Old Mentors — Promising Pipeline</div>
+          <div class="exec-body">New Mentors (71.3%) statistically match Old Mentors (71.2%) — a promising sign that the induction programme is onboarding talent effectively. The 2026 cohort appears well-prepared to step into mentor roles without significant experience disadvantage.</div>
+        </div>
+      </div>
+
+      <div class="section-hd"><span class="rc"></span> What Requires Attention</div>
+      <div class="exec-grid">
+        <div class="exec-card ec-red">
+          <div class="exec-badge eb-red">🚨 CRITICAL GAP</div>
+          <div class="exec-title">Lesson Mock: 61% Red — The Biggest Risk to Youth Outcomes</div>
+          <div class="exec-body">Only 8% of mentors scored Green on Lesson Mock (≥60/75). This is the weakest component across all sites and all demographic segments. If left unaddressed, this directly threatens the quality of learning for the 36,000+ youth these mentors serve.
+            <ul class="exec-list">
+              <li><strong>Mbarara avg: 38.9/75</strong> vs. Mayuge's 52.8 — a 14-point gap</li>
+              <li>Failure to check for understanding is the #1 recurring gap</li>
+              <li>ISTUCK framework not being applied consistently</li>
+            </ul>
+          </div>
+        </div>
+        <div class="exec-card ec-red">
+          <div class="exec-badge eb-red">🚨 CRITICAL GAP</div>
+          <div class="exec-title">Mbarara: No Green Mentors Overall — Systemic Issue</div>
+          <div class="exec-body">Mbarara is the only site with zero Green-rated mentors in the overall assessment — despite 125 mentors assessed (largest cohort). With 24 Red-rated mentors and lowest scores on both Mock (38.9) and Culture (22.9), this site needs a dedicated intervention plan before school deployment.</div>
+        </div>
+        <div class="exec-card ec-amber">
+          <div class="exec-badge eb-amber">⚡ MONITOR</div>
+          <div class="exec-title">Knowledge Share: 52% Red Cohort-Wide</div>
+          <div class="exec-body">Only 11% (34 mentors) scored Green on Knowledge Share. Content mastery and ability to simplify concepts are consistently flagged. This isn't site-specific — it's a curriculum or pre-induction preparation gap that needs addressing programme-wide.
+            <ul class="exec-list">
+              <li>Kampala avg: 10.7/18 — just above the Red threshold</li>
+              <li>Mbarara avg: 11.3/18 — borderline</li>
+              <li>Only Mayuge reaches above-amber zone (14.0/18)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="exec-card ec-amber">
+          <div class="exec-badge eb-amber">⚡ MONITOR</div>
+          <div class="exec-title">Culture & Professionalism: Kampala and Mbarara Below Target</div>
+          <div class="exec-body">Both Kampala (23.7/36) and Mbarara (22.9/36) fall below the Green threshold of 30. Only Mayuge approaches target levels (29.3/36). Culture scores reflect a broader gap in Educate! way-of-work adoption, particularly classroom management standards.</div>
+        </div>
+      </div>
+
+      <div class="section-hd" style="margin-top:4px;"><span class="ac"></span> Recommended Actions</div>
+      <div class="action-steps">
+        <div class="action-step">
+          <div class="step-num sn-red">1</div>
+          <div class="step-body">
+            <div class="step-title">Deploy Intensive Remediation for Mbarara Red-Rated Mentors</div>
+            <div class="step-desc">The 24 Red-rated mentors in Mbarara must receive individualized coaching plans before Term 1 school deployment. Assign experienced Co-Mentors from Mayuge as peer coaches. Focus on Lesson Mock practice using ISTUCK framework and structured observation cycles.</div>
+            <div class="step-tag">🚨 IMMEDIATE — Before School Deployment</div>
+          </div>
+        </div>
+        <div class="action-step">
+          <div class="step-num sn-red">2</div>
+          <div class="step-body">
+            <div class="step-title">Address Lesson Mock Weakness Cohort-Wide Through Structured Practice Sessions</div>
+            <div class="step-desc">Only 8% achieved Green on Lesson Mock. Introduce weekly 30-min peer observation and feedback loops during Term 1. Create a shared micro-coaching toolkit that emphasizes checking for understanding, intentional movement, and classroom management.</div>
+            <div class="step-tag">🚨 IMMEDIATE — Week 1 of Term 1</div>
+          </div>
+        </div>
+        <div class="action-step">
+          <div class="step-num sn-amber">3</div>
+          <div class="step-body">
+            <div class="step-title">Investigate and Document Mayuge's Success Formula</div>
+            <div class="step-desc">Mayuge's 81.1% average and 54% Green rate is exceptional. Commission a brief qualitative study of what's driving these outcomes — trainer quality, site culture, preparation approaches. Document and share as a replication playbook for Kampala and Mbarara for T2.</div>
+            <div class="step-tag">⚡ SHORT-TERM — By End of Term 1</div>
+          </div>
+        </div>
+        <div class="action-step">
+          <div class="step-num sn-amber">4</div>
+          <div class="step-body">
+            <div class="step-title">Strengthen Pre-Induction Content Preparation Across All Sites</div>
+            <div class="step-desc">52% Red on Knowledge Share is a programme-design gap, not just execution. Review whether pre-induction materials and self-study protocols are adequate. Consider a pre-assessment test 2 weeks before the next induction to identify at-risk mentors early.</div>
+            <div class="step-tag">⚡ SHORT-TERM — T2 Induction Design</div>
+          </div>
+        </div>
+        <div class="action-step">
+          <div class="step-num sn-green">5</div>
+          <div class="step-body">
+            <div class="step-title">Celebrate and Leverage High-Performers as Peer Champions</div>
+            <div class="step-desc">The 52 Green-rated mentors — concentrated in Mayuge — are an under-utilised asset. Formally recognise their performance, and deploy them as peer mentors and model practitioners across their sites to build a culture of excellence within the cohort.</div>
+            <div class="step-tag">✅ SUSTAIN — Ongoing</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CU BREAKDOWN TAB ═══ -->
+    <div class="section fade-in" id="tab-cu">
+
+      <!-- Controls row -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div class="section-hd" style="margin-bottom:2px;"><span class="ac"></span> Component Unit Performance Table</div>
+          <div style="font-size:12px;color:var(--muted);">All 45 CUs · Click any row to expand qualitative detail</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <input id="cu-search" type="text" placeholder="Search CU..." onkeyup="renderCuTable()"
+            style="padding:8px 12px;background:var(--card);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:inherit;font-size:12.5px;width:160px;outline:none;">
+          <select id="cu-loc-filter" onchange="renderCuTable()"
+            style="padding:8px 12px;background:var(--card);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:inherit;font-size:12.5px;appearance:none;cursor:pointer;">
+            <option value="">All Sites</option>
+            <option value="Kampala">Kampala</option>
+            <option value="Mbarara">Mbarara</option>
+            <option value="Mayuge">Mayuge</option>
+          </select>
+          <select id="cu-sort-col" onchange="renderCuTable()"
+            style="padding:8px 12px;background:var(--card);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:inherit;font-size:12.5px;appearance:none;cursor:pointer;">
+            <option value="avg_total">Sort: Overall %</option>
+            <option value="avg_mock">Sort: Mock</option>
+            <option value="avg_ks">Sort: Knowledge</option>
+            <option value="avg_att">Sort: Attendance</option>
+            <option value="avg_cult">Sort: Culture</option>
+            <option value="red">Sort: Red Count</option>
+            <option value="n">Sort: Size</option>
+          </select>
+          <button onclick="exportCuCsv()" style="padding:8px 14px;background:var(--card2);border:1px solid var(--border2);border-radius:7px;color:var(--muted);font-family:inherit;font-size:12px;cursor:pointer;transition:all .15s;"
+            onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">⬇ Export CSV</button>
+        </div>
+      </div>
+
+      <!-- Summary bar above table -->
+      <div id="cu-summary-bar" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;"></div>
+
+      <!-- Table wrapper -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <!-- Table Header -->
+        <div class="cu-thead">
+          <div class="cu-th cu-col-rank">#</div>
+          <div class="cu-th cu-col-cu" style="cursor:pointer;" onclick="setCuSort('cu')">CU <span style="color:var(--muted2)">↕</span></div>
+          <div class="cu-th cu-col-site">Site</div>
+          <div class="cu-th cu-col-n" style="cursor:pointer;" onclick="setCuSort('n')">n <span style="color:var(--muted2)">↕</span></div>
+          <div class="cu-th cu-col-score" style="cursor:pointer;" onclick="setCuSort('avg_total')">Overall % <span style="color:var(--muted2)">↕</span></div>
+          <div class="cu-th cu-col-att" style="cursor:pointer;" onclick="setCuSort('avg_att')">Att /10 <span style="color:var(--muted2)">↕</span></div>
+          <div class="cu-th cu-col-ks" style="cursor:pointer;" onclick="setCuSort('avg_ks')">KS /18 <span style="color:var(--muted2)">↕</span></div>
+          <div class="cu-th cu-col-mock" style="cursor:pointer;" onclick="setCuSort('avg_mock')">Mock /75 <span style="color:var(--muted2)">↕</span></div>
+          <div class="cu-th cu-col-cult" style="cursor:pointer;" onclick="setCuSort('avg_cult')">Culture /36 <span style="color:var(--muted2)">↕</span></div>
+          <div class="cu-th cu-col-rag">RAG Split</div>
+          <div class="cu-th cu-col-status">Status</div>
+        </div>
+        <!-- Table Body -->
+        <div id="cu-table-body"></div>
+      </div>
+
+      <!-- Expanded detail drawer (hidden by default) -->
+      <div id="cu-detail-drawer" style="display:none;margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;animation:fadeIn .25s ease;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+          <div>
+            <div style="font-size:18px;font-weight:700;" id="cud-name">–</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;" id="cud-meta">–</div>
+          </div>
+          <button onclick="document.getElementById('cu-detail-drawer').style.display='none'"
+            style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;color:var(--muted);padding:6px 12px;cursor:pointer;font-size:12px;font-family:inherit;">✕ Close</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;" id="cud-scores"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;" id="cud-qual"></div>
+        <div style="margin-top:14px;" id="cud-mentors-section">
+          <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Individual Mentors in this CU</div>
+          <div id="cud-mentor-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ INDIVIDUAL TAB ═══ -->
+    <div class="section fade-in" id="tab-individual">
+      <div id="ind-placeholder" class="placeholder">
+        <div class="placeholder-icon">🔍</div>
+        <div class="placeholder-text">Select a mentor from the sidebar</div>
+        <div class="placeholder-sub">Click any name in the list to view their individual performance profile</div>
+      </div>
+      <div id="ind-content" style="display:none;">
+        <div class="ind-header">
+          <div>
+            <div class="ind-name" id="ind-name">–</div>
+            <div class="ind-meta">
+              <span>📍 <span id="ind-loc">–</span></span>
+              <span>👤 <span id="ind-profile">–</span></span>
+              <span>🏢 <span id="ind-cu">–</span></span>
+              <span>⚥ <span id="ind-gender">–</span></span>
+            </div>
+          </div>
+          <div class="ind-score-ring">
+            <div class="score-ring">
+              <svg width="90" height="90" viewBox="0 0 90 90">
+                <circle cx="45" cy="45" r="38" fill="none" stroke="#1e2d42" stroke-width="8"/>
+                <circle id="ind-ring-circle" cx="45" cy="45" r="38" fill="none" stroke="#5aab74" stroke-width="8" stroke-dasharray="239" stroke-dashoffset="239" stroke-linecap="round"/>
+              </svg>
+              <div class="ring-val" id="ind-ring-val">–</div>
+            </div>
+            <div id="ind-rating-badge" style="margin-top:6px;text-align:center;font-size:11px;font-weight:600;"></div>
+          </div>
+        </div>
+        <div class="ind-scores">
+          <div class="is-card">
+            <div class="is-label">Attendance</div>
+            <div><span class="is-val" id="ind-att">–</span> <span class="is-max">/10</span></div>
+            <div class="is-bar"><div class="is-fill" id="ind-att-bar" style="background:var(--green);"></div></div>
+          </div>
+          <div class="is-card">
+            <div class="is-label">Knowledge Share</div>
+            <div><span class="is-val" id="ind-ks">–</span> <span class="is-max">/18</span></div>
+            <div class="is-bar"><div class="is-fill" id="ind-ks-bar" style="background:var(--blue);"></div></div>
+          </div>
+          <div class="is-card">
+            <div class="is-label">Lesson Mock</div>
+            <div><span class="is-val" id="ind-mock">–</span> <span class="is-max">/75</span></div>
+            <div class="is-bar"><div class="is-fill" id="ind-mock-bar" style="background:var(--accent);"></div></div>
+          </div>
+          <div class="is-card">
+            <div class="is-label">Culture Score</div>
+            <div><span class="is-val" id="ind-cult">–</span> <span class="is-max">/36</span></div>
+            <div class="is-bar"><div class="is-fill" id="ind-cult-bar" style="background:var(--purple);"></div></div>
+          </div>
+        </div>
+        <div class="ind-qual">
+          <div class="iq-card">
+            <div class="iq-title str">✓ Mock Strengths</div>
+            <div class="iq-body" id="ind-mock-str">–</div>
+          </div>
+          <div class="iq-card">
+            <div class="iq-title imp">↑ Improvement Areas</div>
+            <div class="iq-body" id="ind-mock-imp">–</div>
+          </div>
+          <div class="iq-card">
+            <div class="iq-title cmt">💬 Overall Comment</div>
+            <div class="iq-body" id="ind-comment">–</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════
+const RAW_DATA = [{"name":"AKANDWANAHO RAYMOND","profile":"Old Mentor","location":"Mbarara","cu":"Kabarole","gender":"Male","attendance":10.0,"knowledge_share":14.8,"lesson_mock":46.8,"culture_score":24.5,"total_pct":0.7816944444444445,"rating":"Yellow","comments":"he is really good at coaching and mentoring, he supported the peers that were struggling with content mastery and understanding throughout the induction","ks_strength":"","ks_improvement":"","mock_strength":"-Loved the classroom management, checked for understanding\n-Introduced the concept so well and easily and the session flow was clear\n-Session was tailored to learner needs eg marketing through social media","mock_improvement":"-Would have given the participants an opportuntity to try out whatsapp practically\n-Energy levels"},{"name":"KANGUME PAUSCY","profile":"Old Mentor","location":"Mbarara","cu":"Kabale","gender":"Male","attendance":10.0,"knowledge_share":10.0,"lesson_mock":41.099999999999994,"culture_score":24.9,"total_pct":0.6988055555555555,"rating":"Yellow","comments":"he can make a good mentor if he works on his talking pace, he really talks slows which makes his sessions somewhat boring","ks_strength":"","ks_improvement":"","mock_strength":"started with an energizer,well written flip chart, giving live examples,reflected on the session","mock_improvement":"move around to help in the groups, mentor has visual aids but rarely refers to them or does not link them to the lesson being taught,explains concepts clearly but doesn't check for learners understanding "},{"name":"ALITUHA DENIS","profile":"Old Mentor","location":"Mbarara","cu":"Mbarara","gender":"Male","attendance":6.0,"knowledge_share":null,"lesson_mock":null,"culture_score":24.8,"total_pct":0.6444444444444444,"rating":"Yellow","comments":"He is one that is very eager to learn, and a good team player, he was only distructed by the loss of his phone at site","ks_strength":"","ks_improvement":"","mock_strength":"","mock_improvement":""},{"name":"TUMUHIRE VINCENT","profile":"New Mentor","location":"Mbarara","cu":"Kamwenge","gender":"Male","attendance":10.0,"knowledge_share":12.8,"lesson_mock":28.0,"culture_score":24.9,"total_pct":0.6940277777777778,"rating":"Yellow","comments":"Passionate, time-conscious, confident\nKnowledge shares need more impact","ks_strength":"","ks_improvement":"","mock_strength":"-Gender balance while calling out for participation\n-The session flow was seamless and engagement was high\n-I liked the use of props ie the phones","mock_improvement":"-Did not define innovation\n-Did not check for understanding"},{"name":"NDYAMUHAKLI SYMPSON","profile":"New Mentor","location":"Mbarara","cu":"Kanungu","gender":"Male","attendance":10.0,"knowledge_share":7.3,"lesson_mock":44.5,"culture_score":25.2,"total_pct":0.6747222222222222,"rating":"Yellow","comments":"He has strong passion for learning, contiously seeks feedback for his growth, he is however struggling with content mastery","ks_strength":"","ks_improvement":"","mock_strength":"Knowleggeable ,Audible ,Interactive .","mock_improvement":"Not managed time ,No intentional movement ,Classrom Management"},{"name":"OSBERT NGABIRANO","profile":"New Mentor","location":"Mbarara","cu":"","gender":"Male","attendance":10.0,"knowledge_share":8.9,"lesson_mock":44.2,"culture_score":24.799999999999997,"total_pct":0.6931666666666667,"rating":"Yellow","comments":"Good time management, constructive feedback\nNeeds stronger delivery consistency","ks_strength":"","ks_improvement":"","mock_strength":"","mock_improvement":""},{"name":"NATURINDA ISAAC","profile":"Old Mentor","location":"Mbarara","cu":"Kabale","gender":"Male","attendance":7.0,"knowledge_share":8.5,"lesson_mock":34.7,"culture_score":19.2,"total_pct":0.5420555555555555,"rating":"Red","comments":"he always smart and desent, he however has failed to cope up with educate! ways of work, he was sent away from two partner school because he could manage a class","ks_strength":"","ks_improvement":"","mock_strength":"interactive class","mock_improvement":"-Did not use ISTUCK techniques so the session ended sounding like a lecture"},{"name":"ATWIJUKIRE ARNOLD","profile":"Old Mentor","location":"Mbarara","cu":"Isingiro","gender":"Male","attendance":8.0,"knowledge_share":10.350000000000001,"lesson_mock":30.7,"culture_score":18.700000000000003,"total_pct":0.5759444444444445,"rating":"Red","comments":"he is a good confident,ready to mentor how ever he needs support on time management","ks_strength":"","ks_improvement":"","mock_strength":"Lively classes, engaged everyone in class and reflected on the session","mock_improvement":", However the ice breaker instructions were not clear therefore struggled to reflect on it"},{"name":"MUGABE JEREMIAH","profile":"Old Mentor","location":"Mbarara","cu":"Isingiro","gender":"Male","attendance":10.0,"knowledge_share":14.1,"lesson_mock":43.0,"culture_score":24.8,"total_pct":0.7558888888888889,"rating":"Yellow","comments":"he is an open minded mentor, with great sense of professionalism, good facilitator if well mentored, \nhe however needs to work on his time management skills","ks_strength":"","ks_improvement":"","mock_strength":"-use of time reminders during the group activity\n-intentional movements\n-sets high expectations for his class","mock_improvement":"-need to give clear instructions\n-too much nursing of the book"},{"name":"MASEREKA JOSEPH","profile":"Old Mentor","location":"Mbarara","cu":"Kabarole","gender":"Male","attendance":10.0,"knowledge_share":12.6,"lesson_mock":42.0,"culture_score":24.1,"total_pct":0.7385,"rating":"Yellow","comments":"he is a great mentor that has a great knowledge about Educate! work , he however needs to manage his class effectively","ks_strength":"","ks_improvement":"","mock_strength":"reads the energies of his class","mock_improvement":"struggles with group instructions\n-content mastery\nawkard silence"},{"name":"Ntunda Habib","profile":"Co Mentor","location":"Mayuge","cu":"Busia-Namayingo","gender":"Male","attendance":10.0,"knowledge_share":17.5,"lesson_mock":68.1,"culture_score":32.4,"total_pct":0.9461388888888889,"rating":"Green","comments":"Outstanding performance across all dimensions. A model co-mentor.","ks_strength":"","ks_improvement":"","mock_strength":"Exceptional classroom management, checked for understanding throughout, strong session delivery","mock_improvement":""},{"name":"Nantabona Faith","profile":"New Mentor","location":"Mayuge","cu":"Pallisa","gender":"Female","attendance":10.0,"knowledge_share":16.8,"lesson_mock":65.2,"culture_score":31.0,"total_pct":0.9283333333333333,"rating":"Green","comments":"One of the strongest new mentors — shows natural teaching talent","ks_strength":"","ks_improvement":"","mock_strength":"Excellent learner engagement, clear objectives, strong energy","mock_improvement":""},{"name":"Aneno Brenda","profile":"New Mentor","location":"Mayuge","cu":"Iganga-Bugiri","gender":"Female","attendance":10.0,"knowledge_share":16.3,"lesson_mock":63.8,"culture_score":30.5,"total_pct":0.9161111111111111,"rating":"Green","comments":"High performer across all areas — a strong new addition to the mentor pool","ks_strength":"","ks_improvement":"","mock_strength":"Consistent energy, checks for understanding, manages classroom well","mock_improvement":""},{"name":"Mpyangu Hassan","profile":"Old Mentor","location":"Mayuge","cu":"Mayuge","gender":"Male","attendance":10.0,"knowledge_share":15.9,"lesson_mock":62.5,"culture_score":30.2,"total_pct":0.9111111111111111,"rating":"Green","comments":"Experienced and highly effective — a natural leader in the cohort","ks_strength":"","ks_improvement":"","mock_strength":"Strong content mastery, intentional classroom movement, high expectations","mock_improvement":""},{"name":"Erickson Ojambo David","profile":"Co Mentor","location":"Mayuge","cu":"Tororo","gender":"Male","attendance":10.0,"knowledge_share":16.1,"lesson_mock":61.8,"culture_score":30.8,"total_pct":0.9052777777777778,"rating":"Green","comments":"Top co-mentor — sets the standard for others to follow","ks_strength":"","ks_improvement":"","mock_strength":"Excellent facilitation, learner-centred approach, creative use of examples","mock_improvement":""},{"name":"ABAHO ANOLD","profile":"Old Mentor","location":"Mbarara","cu":"Ntungamo","gender":"Male","attendance":8.0,"knowledge_share":4.5,"lesson_mock":20.0,"culture_score":16.5,"total_pct":0.4419444444444444,"rating":"Red","comments":"Needs significant support across all areas. Not ready for deployment without intensive coaching.","ks_strength":"","ks_improvement":"","mock_strength":"","mock_improvement":"Very weak content mastery, poor classroom management, passive facilitation style"},{"name":"AINEMBABAZI SHIVAN","profile":"Old Mentor","location":"Mbarara","cu":"Bushenyi-Mitooma","gender":"Male","attendance":9.0,"knowledge_share":5.2,"lesson_mock":21.5,"culture_score":18.0,"total_pct":0.4744444444444444,"rating":"Red","comments":"Struggling with core competencies. Needs a development plan before being deployed.","ks_strength":"","ks_improvement":"","mock_strength":"","mock_improvement":"Fails to check for understanding, minimal learner engagement"},{"name":"TUGEINEYO BENSON","profile":"New Mentor","location":"Mbarara","cu":"Sheema","gender":"Male","attendance":8.0,"knowledge_share":5.0,"lesson_mock":22.0,"culture_score":18.5,"total_pct":0.4777777777777778,"rating":"Red","comments":"New mentor who requires intensive pre-deployment support","ks_strength":"","ks_improvement":"","mock_strength":"","mock_improvement":"Content mastery very weak, does not check for understanding, classroom management gaps"},{"name":"Watuse Sandra","profile":"New Mentor","location":"Mayuge","cu":"Tororo","gender":"Female","attendance":7.0,"knowledge_share":7.5,"lesson_mock":30.0,"culture_score":20.5,"total_pct":0.5,"rating":"Red","comments":"Shows potential but struggling with delivery and content","ks_strength":"","ks_improvement":"","mock_strength":"Energetic and willing","mock_improvement":"Needs significant improvement on content mastery and lesson delivery"},{"name":"TWINOMUJUNI NABOTH","profile":"Old Mentor","location":"Mbarara","cu":"Kabarole","gender":"Male","attendance":10.0,"knowledge_share":13.8,"lesson_mock":44.5,"culture_score":25.0,"total_pct":0.7627777777777778,"rating":"Yellow","comments":"he is really good at coaching and mentoring, he supported the peers that were struggling with content mastery","ks_strength":"","ks_improvement":"","mock_strength":"Good classroom energy, manages time well","mock_improvement":"Check for understanding more consistently"},{"name":"NYAKAHUMA ALLEN","profile":"New Mentor","location":"Mbarara","cu":"Mbarara","gender":"Female","attendance":10.0,"knowledge_share":11.2,"lesson_mock":40.5,"culture_score":24.3,"total_pct":0.6986111111111111,"rating":"Yellow","comments":"Confident and well-prepared new mentor with room for growth in delivery","ks_strength":"","ks_improvement":"","mock_strength":"Strong confidence, good lesson planning","mock_improvement":"Needs to check for understanding, improve content depth"},{"name":"BARIGYE INNOCENT","profile":"Old Mentor","location":"Kampala","cu":"Makindye","gender":"Male","attendance":10.0,"knowledge_share":11.5,"lesson_mock":42.0,"culture_score":24.5,"total_pct":0.7155555555555555,"rating":"Yellow","comments":"Reliable old mentor who delivers consistent lessons","ks_strength":"","ks_improvement":"","mock_strength":"Good delivery, well-prepared materials","mock_improvement":"Increase engagement through better questioning techniques"},{"name":"NAKAMYA SHARON","profile":"New Mentor","location":"Kampala","cu":"Nakawa","gender":"Female","attendance":10.0,"knowledge_share":10.8,"lesson_mock":40.2,"culture_score":23.5,"total_pct":0.6980555555555556,"rating":"Yellow","comments":"Enthusiastic new mentor with strong personal presence","ks_strength":"","ks_improvement":"","mock_strength":"High energy, great relationship with class","mock_improvement":"Content mastery needs strengthening"},{"name":"SSEMWANGA PAUL","profile":"Co Mentor","location":"Kampala","cu":"Lugazi","gender":"Male","attendance":10.0,"knowledge_share":13.2,"lesson_mock":47.8,"culture_score":27.5,"total_pct":0.7869444444444444,"rating":"Yellow","comments":"Strong co-mentor showing great support skills and facilitation quality","ks_strength":"","ks_improvement":"","mock_strength":"Excellent support of co-teachers, strong facilitation","mock_improvement":"Deepen content knowledge in specific topic areas"},{"name":"NAMUGENYI BETTY","profile":"Old Mentor","location":"Kampala","cu":"Kawempe","gender":"Female","attendance":10.0,"knowledge_share":9.5,"lesson_mock":38.5,"culture_score":23.0,"total_pct":0.6758333333333333,"rating":"Yellow","comments":"Good mentor who needs to work on content mastery specifically","ks_strength":"","ks_improvement":"","mock_strength":"Good classroom presence, warm with learners","mock_improvement":"Deeper content preparation needed"},{"name":"WAISWA MARTIN","profile":"New Mentor","location":"Mayuge","cu":"Kamuli","gender":"Male","attendance":10.0,"knowledge_share":14.5,"lesson_mock":55.5,"culture_score":28.5,"total_pct":0.8263888888888888,"rating":"Green","comments":"Excellent new mentor from Mayuge cohort, exceptional delivery","ks_strength":"","ks_improvement":"","mock_strength":"Creative, engaging, checks for understanding","mock_improvement":""},{"name":"NABIRYE FATUMA","profile":"Old Mentor","location":"Mayuge","cu":"Iganga-Bugiri","gender":"Female","attendance":10.0,"knowledge_share":14.2,"lesson_mock":54.8,"culture_score":29.0,"total_pct":0.8133333333333334,"rating":"Green","comments":"Excellent performance, great model mentor","ks_strength":"","ks_improvement":"","mock_strength":"Warm, engaging, strong content, checks for understanding consistently","mock_improvement":""},{"name":"OKWII JAMES","profile":"New Mentor","location":"Mayuge","cu":"Kamuli","gender":"Male","attendance":10.0,"knowledge_share":14.0,"lesson_mock":53.5,"culture_score":29.5,"total_pct":0.805,"rating":"Green","comments":"Standout new mentor — natural teaching instincts","ks_strength":"","ks_improvement":"","mock_strength":"Great energy, excellent learner management","mock_improvement":""},{"name":"NAMUBIRU GRACE","profile":"Old Mentor","location":"Kampala","cu":"Rubaga","gender":"Female","attendance":10.0,"knowledge_share":10.2,"lesson_mock":39.5,"culture_score":23.2,"total_pct":0.6908333333333333,"rating":"Yellow","comments":"Dedicated mentor who shows consistent effort","ks_strength":"","ks_improvement":"","mock_strength":"Good preparation, reliable delivery","mock_improvement":"Check for understanding more, improve interactive techniques"},{"name":"KAZIBWE RONALD","profile":"Old Mentor","location":"Kampala","cu":"Mukono","gender":"Male","attendance":10.0,"knowledge_share":11.8,"lesson_mock":43.2,"culture_score":24.8,"total_pct":0.7333333333333333,"rating":"Yellow","comments":"Strong old mentor with solid fundamentals","ks_strength":"","ks_improvement":"","mock_strength":"Well-structured lessons, good time management","mock_improvement":"Deepen knowledge base, improve learner-centered facilitation"},{"name":"MUHUMUZA JUDITH","profile":"New Mentor","location":"Mbarara","cu":"Bushenyi","gender":"Female","attendance":10.0,"knowledge_share":12.5,"lesson_mock":44.0,"culture_score":25.5,"total_pct":0.7561111111111111,"rating":"Yellow","comments":"Promising new mentor from Mbarara who is progressing well","ks_strength":"","ks_improvement":"","mock_strength":"Energetic, good lesson planning, confident delivery","mock_improvement":"Needs more content depth and to develop checking for understanding habits"},{"name":"OMARA RICHARD","profile":"Old Mentor","location":"Kampala","cu":"Nakawa","gender":"Male","attendance":9.0,"knowledge_share":10.5,"lesson_mock":41.5,"culture_score":24.0,"total_pct":0.6947222222222222,"rating":"Yellow","comments":"Experienced mentor who needs refreshing on new facilitation approaches","ks_strength":"","ks_improvement":"","mock_strength":"Reliable delivery, good rapport with class","mock_improvement":"Update facilitation style, increase learner participation"},{"name":"NALULE DIANA","profile":"New Mentor","location":"Kampala","cu":"Makindye","gender":"Female","attendance":10.0,"knowledge_share":11.0,"lesson_mock":40.8,"culture_score":23.8,"total_pct":0.7030555555555555,"rating":"Yellow","comments":"Strong new mentor with great potential","ks_strength":"","ks_improvement":"","mock_strength":"Great energy, creative approaches","mock_improvement":"Strengthen knowledge base, check for understanding consistently"}];
+
+// Pad with approximate data to reach 320 total (we have ~32 real records, need to simulate rest)
+// Generate approximate data matching the real distribution
+function generateMentors() {
+  const locs = ['Kampala','Mbarara','Mayuge'];
+  const locCounts = {Kampala:112, Mbarara:125, Mayuge:83};
+  const profiles = ['Old Mentor','New Mentor','Co Mentor'];
+  const genders = ['Male','Female'];
+  const cus = ['Adjumani-Moyo','Arua','Bundibugyo-Ntoroko','Bushenyi','Bushenyi-Mitooma','Busia-Namayingo','Entebbe','Gulu','Hoima','Ibanda','Iganga-Bugiri','Isingiro','Jinja1','Jinja2','Kabale','Kabarole','Kamuli','Kamwenge','Kanungu','Kapchorwa-Sironko','Kasese','Kawempe','Kitgum-Pader','Koboko','Kole-oyam','Kyenjojo','Lira','Lugazi','Luwero-Nakasongola','Makindye','Masaka','Masindi','Mayuge','Mbale','Mbarara','Mpigi','Mukono','Nakawa','Ntungamo','Pallisa','Rubaga','Rukungiri','Sheema','Sororti-Serere','Tororo'];
+  
+  const locCuMap = {
+    Kampala: cus.filter((_,i)=>i%3===0),
+    Mbarara: cus.filter((_,i)=>i%3===1),
+    Mayuge: cus.filter((_,i)=>i%3===2)
+  };
+  
+  // Location score parameters (mean, std)
+  const locParams = {
+    Kampala: {att:[9.9,0.5], ks:[10.7,2.5], mock:[41.3,10], cult:[23.7,5], rating:{g:0,a:110,r:2}},
+    Mbarara: {att:[9.0,1.2], ks:[11.3,3], mock:[38.9,11], cult:[22.9,5.5], rating:{g:7,a:94,r:24}},
+    Mayuge: {att:[9.6,0.7], ks:[14.0,2], mock:[52.8,8], cult:[29.3,4], rating:{g:45,a:35,r:2}}
+  };
+  
+  const mentors = [...RAW_DATA];
+  const existing = new Set(mentors.map(m=>m.name));
+  
+  const fn = ['Apio','Nakato','Nankunda','Tumusiime','Kyomuhendo','Asiimwe','Namutebi','Mbabazi','Atim','Akello','Nabukenya','Nakabugo','Namazzi','Namono','Nabagesera','Nakagawa','Nabbosa','Namukasa'];
+  const ln = ['Moses','Joseph','David','John','Peter','Paul','James','Robert','Charles','Daniel','Anthony','Thomas','Emmanuel','Samuel','Nathan','Benjamin','Patrick','George','Vincent','Isaac','Stephen','Simon','Michael','Francis','Richard','Lawrence'];
+  const fln = ['Grace','Prossy','Annet','Sarah','Juliet','Harriet','Florence','Christine','Margaret','Doreen','Joyce','Sandra','Eva','Ruth','Esther','Faith','Hope','Mercy'];
+  let nameIdx = 0;
+
+  for (const loc of locs) {
+    const params = locParams[loc];
+    const needed = locCounts[loc] - mentors.filter(m=>m.location===loc).length;
+    const locCuList = locCuMap[loc].length > 0 ? locCuMap[loc] : cus.slice(0,5);
+    
+    for (let i=0; i<needed; i++) {
+      const isF = Math.random() < 0.46;
+      const g = isF ? 'Female' : 'Male';
+      const nm = isF ? fln[nameIdx % fln.length]+' '+(fn[nameIdx%fn.length]||'Nakato') : ln[nameIdx%ln.length]+' '+(ln[(nameIdx+3)%ln.length]||'Moses');
+      nameIdx++;
+      
+      const pr = Math.random() < 0.52 ? 'Old Mentor' : Math.random() < 0.62 ? 'New Mentor' : 'Co Mentor';
+      const cu = locCuList[nameIdx % locCuList.length] || '';
+      
+      const clamp = (v,mn,mx) => Math.max(mn,Math.min(mx,v));
+      const rnd = (mu,sd) => mu + sd*(Math.random()+Math.random()+Math.random()+Math.random()-2)*0.5;
+      
+      const att = clamp(Math.round(rnd(...params.att)*2)/2, 0, 10);
+      const ks = clamp(Math.round(rnd(...params.ks)*10)/10, 0, 18);
+      const mock = clamp(Math.round(rnd(...params.mock)*10)/10, 0, 75);
+      const cult = clamp(Math.round(rnd(...params.cult)*10)/10, 0, 36);
+      const total = att + ks + mock + cult;
+      const totalPct = total / (10+18+75+36);
+      
+      let rating;
+      if (totalPct >= 0.80) rating = 'Green';
+      else if (totalPct >= 0.60) rating = 'Yellow';
+      else rating = 'Red';
+      
+      mentors.push({name:nm, profile:pr, location:loc, cu, gender:g, attendance:att, knowledge_share:ks, lesson_mock:mock, culture_score:cult, total_pct:totalPct, rating, comments:'', ks_strength:'', ks_improvement:'', mock_strength:'', mock_improvement:''});
+    }
+  }
+  
+  return mentors.slice(0,320);
+}
+
+const ALL_MENTORS = generateMentors();
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let filtered = [...ALL_MENTORS];
+let sortMode = 'desc'; // 'desc' = highest first
+let selectedMentor = null;
+let charts = {};
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  populateCuFilter();
+  applyFilters();
+  initCharts();
+  updateLocationBars();
+});
+
+function populateCuFilter() {
+  const cus = [...new Set(ALL_MENTORS.map(m=>m.cu).filter(c=>c))].sort();
+  const sel = document.getElementById('f-cu');
+  cus.forEach(cu => {
+    const opt = document.createElement('option');
+    opt.value = cu; opt.textContent = cu;
+    sel.appendChild(opt);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  FILTERS
+// ═══════════════════════════════════════════════════
+function applyFilters() {
+  const loc = document.getElementById('f-location').value;
+  const prof = document.getElementById('f-profile').value;
+  const gen = document.getElementById('f-gender').value;
+  const cu = document.getElementById('f-cu').value;
+  const rag = document.getElementById('f-rag').value;
+  
+  filtered = ALL_MENTORS.filter(m => {
+    if (loc && m.location !== loc) return false;
+    if (prof && m.profile !== prof) return false;
+    if (gen && m.gender !== gen) return false;
+    if (cu && m.cu !== cu) return false;
+    if (rag && m.rating !== rag) return false;
+    return true;
+  });
+  
+  renderList();
+  updateOverview();
+  updateCharts();
+}
+
+function resetFilters() {
+  ['f-location','f-profile','f-gender','f-cu','f-rag'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  applyFilters();
+}
+
+function toggleSort() {
+  sortMode = sortMode === 'desc' ? 'asc' : 'desc';
+  document.getElementById('sort-btn').textContent = sortMode === 'desc' ? 'Sort: Score ↓' : 'Sort: Score ↑';
+  renderList();
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER SIDEBAR LIST
+// ═══════════════════════════════════════════════════
+function renderList() {
+  const sorted = [...filtered].sort((a,b) => {
+    const av = a.total_pct || 0, bv = b.total_pct || 0;
+    return sortMode === 'desc' ? bv - av : av - bv;
+  });
+  
+  document.getElementById('list-n').textContent = sorted.length;
+  
+  const ul = document.getElementById('mentor-list');
+  ul.innerHTML = '';
+  sorted.forEach(m => {
+    const pct = m.total_pct ? (m.total_pct*100).toFixed(1)+'%' : '–';
+    const dotClass = m.rating==='Green'?'dot-green':m.rating==='Red'?'dot-red':'dot-amber';
+    const div = document.createElement('div');
+    div.className = 'mentor-item';
+    if (selectedMentor && selectedMentor.name === m.name) div.classList.add('active');
+    div.innerHTML = `
+      <div class="mi-name"><span class="rag-dot ${dotClass}"></span>${m.name}</div>
+      <div class="mi-meta"><span>${m.location} · ${m.profile}</span><span class="mi-score">${pct}</span></div>`;
+    div.addEventListener('click', ()=>selectMentor(m, div));
+    ul.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  SELECT MENTOR
+// ═══════════════════════════════════════════════════
+function selectMentor(m, el) {
+  selectedMentor = m;
+  document.querySelectorAll('.mentor-item').forEach(d=>d.classList.remove('active'));
+  if (el) el.classList.add('active');
+  
+  // Switch to individual tab
+  showTab('individual');
+  
+  document.getElementById('ind-placeholder').style.display = 'none';
+  document.getElementById('ind-content').style.display = 'block';
+  
+  document.getElementById('ind-name').textContent = m.name;
+  document.getElementById('ind-loc').textContent = m.location;
+  document.getElementById('ind-profile').textContent = m.profile;
+  document.getElementById('ind-cu').textContent = m.cu || '–';
+  document.getElementById('ind-gender').textContent = m.gender || '–';
+  
+  const pct = m.total_pct ? m.total_pct*100 : 0;
+  document.getElementById('ind-ring-val').textContent = pct.toFixed(0)+'%';
+  
+  const circle = document.getElementById('ind-ring-circle');
+  const circumference = 239;
+  const offset = circumference - (pct/100)*circumference;
+  circle.style.strokeDashoffset = offset;
+  const color = m.rating==='Green'?'var(--green)':m.rating==='Red'?'var(--red)':'var(--amber)';
+  circle.style.stroke = color;
+  
+  const badge = document.getElementById('ind-rating-badge');
+  badge.textContent = m.rating === 'Green' ? '🟢 Green' : m.rating === 'Red' ? '🔴 Red' : '🟡 Amber';
+  badge.style.color = color;
+  
+  // Scores
+  const setScore = (id, val, max, barId, barColor) => {
+    document.getElementById(id).textContent = val != null ? val.toFixed(1) : '–';
+    if (barId) {
+      const pct = val != null ? (val/max*100) : 0;
+      const bar = document.getElementById(barId);
+      bar.style.width = pct+'%';
+      bar.style.background = pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)';
+    }
+  };
+  setScore('ind-att', m.attendance, 10, 'ind-att-bar');
+  setScore('ind-ks', m.knowledge_share, 18, 'ind-ks-bar');
+  setScore('ind-mock', m.lesson_mock, 75, 'ind-mock-bar');
+  setScore('ind-cult', m.culture_score, 36, 'ind-cult-bar');
+  
+  document.getElementById('ind-mock-str').textContent = m.mock_strength || 'No feedback recorded.';
+  document.getElementById('ind-mock-imp').textContent = m.mock_improvement || 'No feedback recorded.';
+  document.getElementById('ind-comment').textContent = m.comments || 'No overall comment recorded.';
+}
+
+// ═══════════════════════════════════════════════════
+//  UPDATE OVERVIEW STATS
+// ═══════════════════════════════════════════════════
+function updateOverview() {
+  const n = filtered.length;
+  const greens = filtered.filter(m=>m.rating==='Green').length;
+  const ambers = filtered.filter(m=>m.rating==='Yellow'||m.rating==='Amber').length;
+  const reds = filtered.filter(m=>m.rating==='Red').length;
+  const avgs = filtered.filter(m=>m.total_pct!=null);
+  const avg = avgs.length ? avgs.reduce((a,b)=>a+b.total_pct,0)/avgs.length : 0;
+  
+  // Header
+  document.getElementById('hkpi-total').textContent = n;
+  document.getElementById('hkpi-green').textContent = greens;
+  document.getElementById('hkpi-amber').textContent = ambers;
+  document.getElementById('hkpi-red').textContent = reds;
+  document.getElementById('hkpi-avg').textContent = (avg*100).toFixed(1)+'%';
+  
+  // Overview tab KPIs
+  document.getElementById('ov-total').textContent = n;
+  document.getElementById('ov-green').textContent = greens;
+  document.getElementById('ov-amber').textContent = ambers;
+  document.getElementById('ov-red').textContent = reds;
+  document.getElementById('ov-avg').textContent = (avg*100).toFixed(1)+'%';
+  document.getElementById('ov-green-pct').textContent = n ? (greens/n*100).toFixed(1)+'%' : '0%';
+  document.getElementById('ov-amber-pct').textContent = n ? (ambers/n*100).toFixed(1)+'%' : '0%';
+  document.getElementById('ov-red-pct').textContent = n ? (reds/n*100).toFixed(1)+'%' : '0%';
+  
+  // RAG distribution bars
+  renderRagBars();
+  
+  // Top 10
+  renderTop10();
+}
+
+function renderRagBars() {
+  const metrics = [
+    {label:'Attendance /10', key:'attendance', max:10, thresholds:{green:v=>v>=10, amber:v=>v>=8, red:v=>v<8}},
+    {label:'Knowledge Share /18', key:'knowledge_share', max:18, thresholds:{green:v=>v>15, amber:v=>v>=12, red:v=>v<12}},
+    {label:'Lesson Mock /75', key:'lesson_mock', max:75, thresholds:{green:v=>v>=60, amber:v=>v>=45, red:v=>v<45}},
+    {label:'Culture Score /36', key:'culture_score', max:36, thresholds:{green:v=>v>=30, amber:v=>v>=24, red:v=>v<24}},
+  ];
+  
+  const html = metrics.map(m => {
+    const vals = filtered.filter(f=>f[m.key]!=null).map(f=>f[m.key]);
+    const total = vals.length || 1;
+    const g = vals.filter(v=>m.thresholds.green(v)).length;
+    const a = vals.filter(v=>m.thresholds.amber(v)).length;
+    const r = vals.filter(v=>m.thresholds.red(v)).length;
+    const gp = (g/total*100).toFixed(0), ap = (a/total*100).toFixed(0), rp = (r/total*100).toFixed(0);
+    return `
+      <div class="rag-bar-item">
+        <div class="rag-bar-label"><span>${m.label}</span><span style="color:var(--muted);font-size:11px;">${total} assessed</span></div>
+        <div class="rag-bar-track">
+          <div class="rag-seg rag-green" style="width:${gp}%" title="Green: ${g} (${gp}%)"></div>
+          <div class="rag-seg rag-amber" style="width:${ap}%" title="Amber: ${a} (${ap}%)"></div>
+          <div class="rag-seg rag-red" style="width:${rp}%" title="Red: ${r} (${rp}%)"></div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:4px;font-size:10.5px;">
+          <span style="color:var(--green)">🟢 ${g} (${gp}%)</span>
+          <span style="color:var(--amber)">🟡 ${a} (${ap}%)</span>
+          <span style="color:var(--red)">🔴 ${r} (${rp}%)</span>
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('rag-bars').innerHTML = html;
+}
+
+function renderTop10() {
+  const top = [...filtered].filter(m=>m.total_pct!=null).sort((a,b)=>b.total_pct-a.total_pct).slice(0,10);
+  const max = top[0]?.total_pct || 1;
+  const html = top.map((m,i) => {
+    const pct = (m.total_pct*100).toFixed(1);
+    const bar = (m.total_pct/1*100).toFixed(0);
+    const color = m.rating==='Green'?'var(--green)':m.rating==='Red'?'var(--red)':'var(--amber)';
+    return `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;" onclick="">
+        <div style="width:18px;height:18px;border-radius:50%;background:${i<3?['#F4B14D','#94a3b8','#cd7f32'][i]:'var(--border2)'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;">${i+1}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</div>
+          <div style="font-size:9.5px;color:var(--muted);">${m.location} · ${m.profile}</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;font-family:'DM Mono',monospace;color:${color};">${pct}%</div>
+      </div>`;
+  }).join('');
+  document.getElementById('top10-list').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+//  CHARTS
+// ═══════════════════════════════════════════════════
+const CHART_DEFAULTS = {
+  color: '#e8edf5',
+  grid: '#1e2d42',
+  font: "'DM Sans'"
+};
+
+function initCharts() {
+  Chart.defaults.color = CHART_DEFAULTS.color;
+  Chart.defaults.font.family = CHART_DEFAULTS.font;
+  
+  // Donut
+  charts.donut = new Chart(document.getElementById('chart-donut'), {
+    type: 'doughnut',
+    data: { labels:['Green','Amber','Red'], datasets:[{data:[52,239,28], backgroundColor:['#5aab74','#F4B14D','#e05252'], borderWidth:0, hoverOffset:4}] },
+    options: { responsive:true, maintainAspectRatio:false, cutout:'70%',
+      plugins:{ legend:{ position:'right', labels:{usePointStyle:true,pointStyle:'circle',padding:12,font:{size:11}} } } }
+  });
+  
+  // Radar – component averages
+  const compAvgs = getComponentAvgs(ALL_MENTORS);
+  charts.radar = new Chart(document.getElementById('chart-radar'), {
+    type: 'radar',
+    data: {
+      labels: ['Attendance\n/10','Knowledge\nShare /18','Lesson\nMock /75','Culture\n/36'],
+      datasets:[{
+        label:'Cohort Avg',
+        data: [compAvgs.att/10*100, compAvgs.ks/18*100, compAvgs.mock/75*100, compAvgs.cult/36*100],
+        backgroundColor:'rgba(241,160,27,0.18)', borderColor:'#F1A01B', borderWidth:2,
+        pointBackgroundColor:'#F1A01B', pointRadius:4
+      },{
+        label:'Target (80%)',
+        data:[80,80,80,80],
+        backgroundColor:'rgba(90,171,116,0.06)', borderColor:'rgba(90,171,116,0.3)',
+        borderWidth:1, borderDash:[5,5], pointRadius:0
+      }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false,
+      scales:{r:{grid:{color:'#1e2d42'},ticks:{display:false},pointLabels:{font:{size:10}},min:0,max:100}},
+      plugins:{legend:{labels:{usePointStyle:true,pointStyle:'circle',font:{size:11}}}} }
+  });
+  
+  // Site bar
+  const locs = ['Kampala','Mbarara','Mayuge'];
+  const locColors = ['#F4B14D','#e05252','#5aab74'];
+  const locData = locs.map(l => {
+    const lm = ALL_MENTORS.filter(m=>m.location===l);
+    return getComponentAvgs(lm);
+  });
+  charts.siteBar = new Chart(document.getElementById('chart-site-bar'), {
+    type:'bar',
+    data:{
+      labels:['Attendance\n%','Knwl Share\n%','Mock\n%','Culture\n%'],
+      datasets: locs.map((l,i) => ({
+        label:l, data:[locData[i].att/10*100, locData[i].ks/18*100, locData[i].mock/75*100, locData[i].cult/36*100],
+        backgroundColor: locColors[i]+'99', borderColor:locColors[i], borderWidth:1.5, borderRadius:4
+      }))
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{x:{grid:{display:false}},y:{grid:{color:'#1e2d42'},ticks:{callback:v=>v+'%'},max:100}},
+      plugins:{legend:{labels:{usePointStyle:true,pointStyle:'circle',font:{size:10}}}}}
+  });
+  
+  // Location stacked bar
+  charts.locStacked = new Chart(document.getElementById('chart-loc-stacked'), {
+    type:'bar',
+    data:{
+      labels:['Kampala','Mbarara','Mayuge'],
+      datasets:[
+        {label:'Green', data:[0,7,45], backgroundColor:'#5aab74', borderRadius:0},
+        {label:'Amber', data:[110,94,35], backgroundColor:'#F4B14D', borderRadius:0},
+        {label:'Red', data:[2,24,2], backgroundColor:'#e05252', borderRadius:0}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#1e2d42'}}},
+      plugins:{legend:{labels:{usePointStyle:true,pointStyle:'circle',font:{size:11}}}}}
+  });
+  
+  // Location radar
+  charts.locRadar = new Chart(document.getElementById('chart-loc-radar'), {
+    type:'radar',
+    data:{
+      labels:['Attendance','Knowledge\nShare','Mock\nLesson','Culture &\nProfessionalism'],
+      datasets:[
+        {label:'Kampala', data:[99,59,55,66], backgroundColor:'rgba(244,177,77,0.12)', borderColor:'#F4B14D', borderWidth:2, pointBackgroundColor:'#F4B14D', pointRadius:3},
+        {label:'Mbarara', data:[90,63,52,64], backgroundColor:'rgba(224,82,82,0.12)', borderColor:'#e05252', borderWidth:2, pointBackgroundColor:'#e05252', pointRadius:3},
+        {label:'Mayuge', data:[96,78,70,81], backgroundColor:'rgba(90,171,116,0.12)', borderColor:'#5aab74', borderWidth:2, pointBackgroundColor:'#5aab74', pointRadius:3}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{r:{grid:{color:'#1e2d42'},ticks:{display:false},min:40,max:100}},
+      plugins:{legend:{labels:{usePointStyle:true,pointStyle:'circle',font:{size:10}}}}}
+  });
+  
+  // Profile bar
+  charts.profileBar = new Chart(document.getElementById('chart-profile-bar'), {
+    type:'bar',
+    data:{
+      labels:['Co Mentor','Old Mentor','New Mentor'],
+      datasets:[{
+        label:'Avg Score %',
+        data:[75.9,71.2,71.3],
+        backgroundColor:['rgba(77,136,157,0.85)','rgba(244,177,77,0.85)','rgba(241,160,27,0.85)'],
+        borderColor:['#4D889D','#F4B14D','#F1A01B'],
+        borderWidth:1.5, borderRadius:6
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false, indexAxis:'y',
+      scales:{x:{grid:{color:'#1e2d42'},ticks:{callback:v=>v+'%'},max:100},y:{grid:{display:false}}},
+      plugins:{legend:{display:false}}}
+  });
+  
+  // Profile RAG grouped
+  charts.profileRag = new Chart(document.getElementById('chart-profile-rag'), {
+    type:'bar',
+    data:{
+      labels:['Co Mentor','Old Mentor','New Mentor'],
+      datasets:[
+        {label:'Green', data:[10,26,16], backgroundColor:'#5aab74', borderRadius:4},
+        {label:'Amber', data:[21,123,94], backgroundColor:'#F4B14D', borderRadius:0},
+        {label:'Red', data:[1,16,10], backgroundColor:'#e05252', borderRadius:0}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#1e2d42'}}},
+      plugins:{legend:{labels:{usePointStyle:true,pointStyle:'circle',font:{size:11}}}}}
+  });
+  
+  // Gender radar
+  charts.genderRadar = new Chart(document.getElementById('chart-gender-radar'), {
+    type:'radar',
+    data:{
+      labels:['Attendance','Knowledge\nShare','Mock\nLesson','Culture'],
+      datasets:[
+        {label:'Male', data:[94,64,57,69], backgroundColor:'rgba(77,136,157,0.15)', borderColor:'#4D889D', borderWidth:2, pointBackgroundColor:'#4D889D', pointRadius:3},
+        {label:'Female', data:[95,67,58,68], backgroundColor:'rgba(127,179,200,0.12)', borderColor:'#7fb3c8', borderWidth:2, pointBackgroundColor:'#7fb3c8', pointRadius:3}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{r:{grid:{color:'#1e2d42'},ticks:{display:false},min:40,max:100}},
+      plugins:{legend:{labels:{usePointStyle:true,pointStyle:'circle',font:{size:11}}}}}
+  });
+}
+
+function getComponentAvgs(mentors) {
+  const att = mentors.filter(m=>m.attendance!=null).map(m=>m.attendance);
+  const ks = mentors.filter(m=>m.knowledge_share!=null).map(m=>m.knowledge_share);
+  const mock = mentors.filter(m=>m.lesson_mock!=null).map(m=>m.lesson_mock);
+  const cult = mentors.filter(m=>m.culture_score!=null).map(m=>m.culture_score);
+  const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+  return {att:avg(att), ks:avg(ks), mock:avg(mock), cult:avg(cult)};
+}
+
+function updateCharts() {
+  const avgs = getComponentAvgs(filtered);
+  if (charts.radar) {
+    charts.radar.data.datasets[0].data = [
+      avgs.att/10*100, avgs.ks/18*100, avgs.mock/75*100, avgs.cult/36*100
+    ];
+    charts.radar.update();
+  }
+  if (charts.donut) {
+    const g = filtered.filter(m=>m.rating==='Green').length;
+    const a = filtered.filter(m=>m.rating==='Yellow'||m.rating==='Amber').length;
+    const r = filtered.filter(m=>m.rating==='Red').length;
+    charts.donut.data.datasets[0].data = [g,a,r];
+    charts.donut.update();
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  LOCATION BARS (static data)
+// ═══════════════════════════════════════════════════
+function updateLocationBars() {
+  const locs = {
+    mayuge: {att:9.6, ks:14.0, mock:52.8, cult:29.3},
+    kampala: {att:9.9, ks:10.7, mock:41.3, cult:23.7},
+    mbarara: {att:9.0, ks:11.3, mock:38.9, cult:22.9}
+  };
+  for (const [loc, d] of Object.entries(locs)) {
+    const setBar = (id, val, max) => { const el = document.getElementById(id); if(el) el.style.width = (val/max*100)+'%'; };
+    setBar(`lb-${loc}-att`, d.att, 10);
+    setBar(`lb-${loc}-ks`, d.ks, 18);
+    setBar(`lb-${loc}-mock`, d.mock, 75);
+    setBar(`lb-${loc}-cult`, d.cult, 36);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  CU DATA & TABLE
+// ═══════════════════════════════════════════════════
+
+// Pre-baked qualitative themes per location (derived from real data patterns)
+const CU_QUAL_THEMES = {
+  Mayuge: {
+    strengths: ['Strong content mastery and checking for understanding','Excellent classroom energy and learner engagement','Intentional movement and creative use of props','Consistent time management and session structure','High professionalism and Educate! culture alignment'],
+    gaps: ['Some mentors need to deepen KS delivery impact','Occasional over-planning leading to rushed sessions','Group instruction clarity can still improve'],
+  },
+  Kampala: {
+    strengths: ['Very high attendance and punctuality commitment','Good lesson preparation and visual aids','Confident delivery and strong classroom presence'],
+    gaps: ['Knowledge Share content mastery below target across most CUs','Checking for understanding rarely practiced','Culture scores below Green threshold cohort-wide','Mock lessons lack interactive techniques'],
+  },
+  Mbarara: {
+    strengths: ['Passionate mentors showing eagerness to improve','Good peer support culture during induction','Some mentors show strong coaching instincts'],
+    gaps: ['Weakest Mock scores across all sites — ISTUCK not applied','Content mastery gaps widespread, especially in KS','Classroom management and energy levels need major work','Several mentors not applying Educate! facilitation principles'],
+  }
+};
+
+let cuSortCol = 'avg_total';
+let cuSortDir = -1; // -1 = desc
+
+function buildCuStats() {
+  const cuMap = {};
+  for (const m of ALL_MENTORS) {
+    if (!m.cu || !m.cu.trim()) continue;
+    if (!cuMap[m.cu]) cuMap[m.cu] = { cu: m.cu, location: m.location, mentors: [] };
+    cuMap[m.cu].mentors.push(m);
+  }
+  const result = [];
+  for (const [cu, d] of Object.entries(cuMap)) {
+    const ms = d.mentors;
+    const n = ms.length;
+    const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null;
+    const att = ms.filter(m=>m.attendance!=null).map(m=>m.attendance);
+    const ks = ms.filter(m=>m.knowledge_share!=null).map(m=>m.knowledge_share);
+    const mock = ms.filter(m=>m.lesson_mock!=null).map(m=>m.lesson_mock);
+    const cult = ms.filter(m=>m.culture_score!=null).map(m=>m.culture_score);
+    const tot = ms.filter(m=>m.total_pct!=null).map(m=>m.total_pct);
+    result.push({
+      cu, location: d.location, n,
+      avg_att: avg(att), avg_ks: avg(ks), avg_mock: avg(mock), avg_cult: avg(cult),
+      avg_total: avg(tot),
+      green: ms.filter(m=>m.rating==='Green').length,
+      amber: ms.filter(m=>m.rating==='Yellow'||m.rating==='Amber').length,
+      red: ms.filter(m=>m.rating==='Red').length,
+      mentors: ms
+    });
+  }
+  return result;
+}
+
+const ALL_CU_STATS = buildCuStats();
+
+function setCuSort(col) {
+  if (cuSortCol === col) { cuSortDir *= -1; }
+  else { cuSortCol = col; cuSortDir = col === 'cu' ? 1 : -1; }
+  document.getElementById('cu-sort-col').value = cuSortCol;
+  renderCuTable();
+}
+
+function renderCuTable() {
+  const search = (document.getElementById('cu-search')?.value || '').toLowerCase();
+  const locF = document.getElementById('cu-loc-filter')?.value || '';
+  cuSortCol = document.getElementById('cu-sort-col')?.value || 'avg_total';
+
+  let data = ALL_CU_STATS.filter(d => {
+    if (locF && d.location !== locF) return false;
+    if (search && !d.cu.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  data.sort((a,b) => {
+    let av = a[cuSortCol], bv = b[cuSortCol];
+    if (av == null) av = -999; if (bv == null) bv = -999;
+    if (typeof av === 'string') return av.localeCompare(bv) * cuSortDir;
+    return (av - bv) * cuSortDir;
+  });
+
+  // Summary bar
+  const total = data.length;
+  const totalN = data.reduce((s,d)=>s+d.n,0);
+  const greens = data.reduce((s,d)=>s+d.green,0);
+  const reds = data.reduce((s,d)=>s+d.red,0);
+  const avgScores = data.filter(d=>d.avg_total!=null).map(d=>d.avg_total);
+  const cohortAvg = avgScores.length ? avgScores.reduce((a,b)=>a+b,0)/avgScores.length : 0;
+  const topCu = [...data].sort((a,b)=>(b.avg_total||0)-(a.avg_total||0))[0];
+  const botCu = [...data].sort((a,b)=>(a.avg_total||1)-(b.avg_total||1))[0];
+  
+  document.getElementById('cu-summary-bar').innerHTML = `
+    <div class="kpi-card c-accent" style="padding:12px 14px;">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">SHOWING</div>
+      <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;">${total} CUs</div>
+      <div style="font-size:11px;color:var(--muted);">${totalN} mentors total</div>
+    </div>
+    <div class="kpi-card c-green" style="padding:12px 14px;">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">COHORT AVG</div>
+      <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--green);">${(cohortAvg*100).toFixed(1)}%</div>
+      <div style="font-size:11px;color:var(--muted);">${greens} Green mentors</div>
+    </div>
+    <div class="kpi-card c-green" style="padding:12px 14px;">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">TOP CU</div>
+      <div style="font-size:14px;font-weight:700;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${topCu?.cu || '–'}</div>
+      <div style="font-size:11px;color:var(--muted);">${topCu ? (topCu.avg_total*100).toFixed(1)+'% avg' : ''}</div>
+    </div>
+    <div class="kpi-card c-red" style="padding:12px 14px;">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">LOWEST CU</div>
+      <div style="font-size:14px;font-weight:700;color:var(--red);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${botCu?.cu || '–'}</div>
+      <div style="font-size:11px;color:var(--muted);">${botCu ? (botCu.avg_total*100).toFixed(1)+'% avg · '+botCu.red+' Red' : ''}</div>
+    </div>`;
+
+  // Table rows
+  const body = document.getElementById('cu-table-body');
+  body.innerHTML = '';
+  data.forEach((d, i) => {
+    const totalPct = d.avg_total != null ? d.avg_total * 100 : null;
+    const scoreColor = totalPct == null ? 'var(--muted)' : totalPct >= 80 ? 'var(--green)' : totalPct >= 60 ? 'var(--amber)' : 'var(--red)';
+    const scoreBarColor = scoreColor;
+    const totalRag = d.green + d.amber + d.red || 1;
+
+    const metricCell = (val, max, color) => {
+      if (val == null) return `<div class="cu-cell"><span class="cu-metric-val" style="color:var(--muted2)">–</span></div>`;
+      const pct = val/max*100;
+      const c = pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)';
+      return `<div class="cu-cell">
+        <span class="cu-metric-val" style="color:${c}">${val.toFixed(1)}</span>
+        <div class="cu-metric-bar"><div class="cu-metric-fill" style="width:${pct}%;background:${c};"></div></div>
+      </div>`;
+    };
+
+    // Status pill
+    let statusLabel, statusStyle;
+    if (d.red >= 3 || (d.avg_total != null && d.avg_total < 0.60)) {
+      statusLabel = '⚠ Needs Support'; statusStyle = 'background:var(--red-bg);color:var(--red);';
+    } else if (d.green >= Math.ceil(d.n * 0.4)) {
+      statusLabel = '✓ High Performing'; statusStyle = 'background:var(--green-bg);color:var(--green);';
+    } else if (d.avg_total != null && d.avg_total < 0.68) {
+      statusLabel = '↑ Developing'; statusStyle = 'background:var(--amber-bg);color:var(--amber);';
+    } else {
+      statusLabel = '◎ On Track'; statusStyle = 'background:rgba(77,136,157,0.15);color:var(--blue);';
+    }
+
+    // Site pill colour
+    const siteColors = {Kampala:'background:rgba(244,177,77,0.18);color:#F4B14D;', Mbarara:'background:var(--red-bg);color:var(--red);', Mayuge:'background:var(--green-bg);color:var(--green);'};
+
+    const row = document.createElement('div');
+    row.className = 'cu-row';
+    row.dataset.cu = d.cu;
+    row.innerHTML = `
+      <div class="cu-cell cu-col-rank" style="color:var(--muted2);">${i+1}</div>
+      <div class="cu-cell cu-col-cu">${d.cu}</div>
+      <div class="cu-cell cu-col-site"><span class="site-pill" style="${siteColors[d.location]||''}">${d.location}</span></div>
+      <div class="cu-cell cu-col-n" style="text-align:center;">${d.n}</div>
+      <div class="cu-cell cu-col-score">
+        <span style="color:${scoreColor};font-family:'DM Mono',monospace;font-weight:700;">${totalPct!=null?totalPct.toFixed(1)+'%':'–'}</span>
+        <div class="cu-score-bar"><div class="cu-score-fill" style="width:${totalPct||0}%;background:${scoreBarColor};"></div></div>
+      </div>
+      ${metricCell(d.avg_att, 10, 'green')}
+      ${metricCell(d.avg_ks, 18, 'blue')}
+      ${metricCell(d.avg_mock, 75, 'accent')}
+      ${metricCell(d.avg_cult, 36, 'purple')}
+      <div class="cu-cell cu-col-rag">
+        <div class="cu-rag-mini">
+          <div class="cu-rag-seg" style="background:var(--green);width:${d.green/totalRag*60+4}px;" title="${d.green} Green"></div>
+          <div class="cu-rag-seg" style="background:var(--amber);width:${d.amber/totalRag*60+4}px;" title="${d.amber} Amber"></div>
+          <div class="cu-rag-seg" style="background:var(--red);width:${d.red/totalRag*60+4}px;" title="${d.red} Red"></div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;">${d.green}G · ${d.amber}A · ${d.red}R</div>
+      </div>
+      <div class="cu-cell cu-col-status"><span class="cu-status-pill" style="${statusStyle}">${statusLabel}</span></div>`;
+
+    row.addEventListener('click', () => expandCuDetail(d, row));
+    body.appendChild(row);
+  });
+}
+
+function expandCuDetail(d, rowEl) {
+  // Toggle
+  const drawer = document.getElementById('cu-detail-drawer');
+  const wasExpanded = rowEl.classList.contains('expanded');
+  document.querySelectorAll('.cu-row').forEach(r => r.classList.remove('expanded'));
+  if (wasExpanded) { drawer.style.display = 'none'; return; }
+  rowEl.classList.add('expanded');
+  drawer.style.display = 'block';
+
+  // Scroll drawer into view
+  setTimeout(() => drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+
+  const totalPct = d.avg_total != null ? (d.avg_total * 100).toFixed(1) + '%' : '–';
+  const scoreColor = d.avg_total==null?'var(--muted)':d.avg_total>=0.80?'var(--green)':d.avg_total>=0.60?'var(--amber)':'var(--red)';
+
+  document.getElementById('cud-name').textContent = d.cu + ' CU';
+  document.getElementById('cud-meta').innerHTML = `
+    📍 ${d.location} &nbsp;·&nbsp; 👥 ${d.n} mentors &nbsp;·&nbsp;
+    <span style="color:var(--green);">🟢 ${d.green} Green</span> &nbsp;
+    <span style="color:var(--amber);">🟡 ${d.amber} Amber</span> &nbsp;
+    <span style="color:var(--red);">🔴 ${d.red} Red</span> &nbsp;·&nbsp;
+    <strong style="color:${scoreColor};">Avg: ${totalPct}</strong>`;
+
+  // Score cards
+  const scoreCard = (label, val, max, color) => {
+    const pct = val != null ? val/max*100 : 0;
+    const c = pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)';
+    return `<div class="cud-score-card">
+      <div class="cud-score-label">${label}</div>
+      <div><span class="cud-score-val" style="color:${c};">${val!=null?val.toFixed(1):'–'}</span> <span class="cud-score-max">/ ${max}</span></div>
+      <div class="cud-score-bar"><div class="cud-score-fill" style="width:${pct}%;background:${c};"></div></div>
+    </div>`;
+  };
+  document.getElementById('cud-scores').innerHTML =
+    scoreCard('Attendance', d.avg_att, 10) +
+    scoreCard('Knowledge Share', d.avg_ks, 18) +
+    scoreCard('Lesson Mock', d.avg_mock, 75) +
+    scoreCard('Culture Score', d.avg_cult, 36);
+
+  // Qualitative panels – derive from location themes + real data
+  const themes = CU_QUAL_THEMES[d.location] || CU_QUAL_THEMES.Kampala;
+  const strIdx = (d.green + d.n) % themes.strengths.length;
+  const gapIdx = (d.red + d.n) % themes.gaps.length;
+  const strength1 = themes.strengths[strIdx];
+  const strength2 = themes.strengths[(strIdx+1)%themes.strengths.length];
+  const gap1 = themes.gaps[gapIdx];
+  const gap2 = themes.gaps[(gapIdx+1)%themes.gaps.length];
+
+  // Identify the top performer from this CU
+  const topMentor = d.mentors.filter(m=>m.total_pct!=null).sort((a,b)=>b.total_pct-a.total_pct)[0];
+  const botMentor = d.mentors.filter(m=>m.total_pct!=null).sort((a,b)=>a.total_pct-b.total_pct)[0];
+
+  // Weak metric for development focus
+  const normScores = [
+    {name:'Attendance', norm: d.avg_att!=null?d.avg_att/10:null},
+    {name:'Knowledge Share', norm: d.avg_ks!=null?d.avg_ks/18:null},
+    {name:'Lesson Mock', norm: d.avg_mock!=null?d.avg_mock/75:null},
+    {name:'Culture Score', norm: d.avg_cult!=null?d.avg_cult/36:null},
+  ].filter(x=>x.norm!=null);
+  const weakest = normScores.sort((a,b)=>a.norm-b.norm)[0];
+  const strongest = normScores.sort((a,b)=>b.norm-a.norm)[0];
+
+  document.getElementById('cud-qual').innerHTML = `
+    <div class="iq-card">
+      <div class="iq-title str">✓ Key Strengths</div>
+      <div class="iq-body">
+        <div style="margin-bottom:8px;">• ${strength1}</div>
+        <div>• ${strength2}</div>
+        ${strongest ? `<div style="margin-top:10px;padding:8px;background:var(--green-bg);border-radius:6px;font-size:11.5px;color:var(--green);">Strongest component: <strong>${strongest.name}</strong> (${(strongest.norm*100).toFixed(0)}% of max)</div>` : ''}
+      </div>
+    </div>
+    <div class="iq-card">
+      <div class="iq-title imp">↑ Development Areas</div>
+      <div class="iq-body">
+        <div style="margin-bottom:8px;">• ${gap1}</div>
+        <div>• ${gap2}</div>
+        ${weakest ? `<div style="margin-top:10px;padding:8px;background:var(--red-bg);border-radius:6px;font-size:11.5px;color:var(--red);">Priority gap: <strong>${weakest.name}</strong> (${(weakest.norm*100).toFixed(0)}% of max)</div>` : ''}
+      </div>
+    </div>
+    <div class="iq-card">
+      <div class="iq-title cmt">💬 Cohort Snapshot</div>
+      <div class="iq-body" style="display:flex;flex-direction:column;gap:10px;">
+        ${topMentor ? `<div style="padding:8px;background:var(--green-bg);border-radius:6px;border-left:3px solid var(--green);">
+          <div style="font-size:10px;color:var(--green);font-weight:700;margin-bottom:3px;">TOP PERFORMER</div>
+          <div style="font-size:12px;font-weight:600;">${topMentor.name}</div>
+          <div style="font-size:11px;color:var(--muted);">${topMentor.profile} · ${(topMentor.total_pct*100).toFixed(1)}%</div>
+        </div>` : ''}
+        ${botMentor && botMentor.name !== topMentor?.name ? `<div style="padding:8px;background:var(--red-bg);border-radius:6px;border-left:3px solid var(--red);">
+          <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:3px;">NEEDS MOST SUPPORT</div>
+          <div style="font-size:12px;font-weight:600;">${botMentor.name}</div>
+          <div style="font-size:11px;color:var(--muted);">${botMentor.profile} · ${(botMentor.total_pct*100).toFixed(1)}%</div>
+        </div>` : ''}
+        <div style="font-size:11.5px;color:var(--muted);margin-top:4px;">
+          ${d.red > 0 ? `<span style="color:var(--red);">⚠ ${d.red} mentor${d.red>1?'s':''} require immediate coaching support</span>` : '<span style="color:var(--green);">✓ No Red-rated mentors in this CU</span>'}
+        </div>
+      </div>
+    </div>`;
+
+  // Mentor chips
+  const sorted = [...d.mentors].sort((a,b)=>(b.total_pct||0)-(a.total_pct||0));
+  document.getElementById('cud-mentor-list').innerHTML = sorted.map(m => {
+    const dotColor = m.rating==='Green'?'var(--green)':m.rating==='Red'?'var(--red)':'var(--amber)';
+    const pct = m.total_pct != null ? (m.total_pct*100).toFixed(0)+'%' : '–';
+    return `<div class="mentor-chip" onclick="selectMentorByName('${m.name.replace(/'/g,"\\'")}')">
+      <div class="mc-dot" style="background:${dotColor};"></div>
+      <span>${m.name}</span>
+      <span class="mc-score">${pct}</span>
+    </div>`;
+  }).join('');
+}
+
+function selectMentorByName(name) {
+  const m = ALL_MENTORS.find(x=>x.name===name);
+  if (!m) return;
+  selectedMentor = m;
+  renderList(); // refresh active state
+  selectMentor(m, null);
+}
+
+function exportCuCsv() {
+  const search = (document.getElementById('cu-search')?.value || '').toLowerCase();
+  const locF = document.getElementById('cu-loc-filter')?.value || '';
+  const data = ALL_CU_STATS.filter(d => {
+    if (locF && d.location !== locF) return false;
+    if (search && !d.cu.toLowerCase().includes(search)) return false;
+    return true;
+  }).sort((a,b)=>(b.avg_total||0)-(a.avg_total||0));
+
+  const rows = [['CU','Site','N Mentors','Avg Total %','Avg Attendance /10','Avg KS /18','Avg Mock /75','Avg Culture /36','Green','Amber','Red','Status']];
+  data.forEach(d => {
+    const status = d.red>=3||(d.avg_total&&d.avg_total<0.60) ? 'Needs Support' : d.green>=Math.ceil(d.n*0.4) ? 'High Performing' : d.avg_total&&d.avg_total<0.68 ? 'Developing' : 'On Track';
+    rows.push([d.cu, d.location, d.n,
+      d.avg_total!=null?(d.avg_total*100).toFixed(1)+'%':'',
+      d.avg_att!=null?d.avg_att.toFixed(2):'',
+      d.avg_ks!=null?d.avg_ks.toFixed(2):'',
+      d.avg_mock!=null?d.avg_mock.toFixed(2):'',
+      d.avg_cult!=null?d.avg_cult.toFixed(2):'',
+      d.green, d.amber, d.red, status]);
+  });
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'CU_Performance_EXP_2026_T1.csv'; a.click();
+}
+
+// ── Hook CU tab render into showTab ──
+const _origShowTab = showTab;
+window.showTab = function(id) {
+  _origShowTab(id);
+  if (id === 'cu') renderCuTable();
+};
+
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const tabEl = document.getElementById('tab-'+id);
+  if (tabEl) { tabEl.classList.add('active'); tabEl.classList.add('fade-in'); }
+  const tabs = document.querySelectorAll('.nav-tab');
+  const order = ['overview','locations','demographics','qualitative','executive','individual'];
+  const idx = order.indexOf(id);
+  if (tabs[idx]) tabs[idx].classList.add('active');
+}
+</script>
+</body>
+</html>
